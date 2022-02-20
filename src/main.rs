@@ -1,13 +1,29 @@
+use std::sync::Arc;
 use actix_files::Files;
 use actix_web::{middleware::Logger, web, App, HttpServer, Scope};
+use futures::executor::block_on;
+use sea_orm::{Database, DatabaseConnection};
+use crate::database::get_connection_pool;
 
 mod config;
 mod handlers;
+mod database;
+
+struct AppState {
+    database_connection: Arc<DatabaseConnection>,
+}
+
+impl Default for AppState {
+    fn default() -> Self {
+        Self {
+            database_connection: Arc::new(block_on(Database::connect(config::Config::default().database_url)).expect("DATABASE CONNECTION"))
+        }
+    }
+}
 
 fn initialize(cfg: &mut web::ServiceConfig) {
     cfg.service(get_scope())
-        // .app_data(web::Data::new());
-    ;
+        .app_data(web::Data::new(AppState::default()));
 }
 
 fn get_scope() -> Scope {

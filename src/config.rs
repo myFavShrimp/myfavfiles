@@ -2,13 +2,14 @@ use serde_derive::Deserialize;
 
 #[derive(Deserialize)]
 pub struct Config {
-    host: String,
+    host_name: String,
     port: u16,
+    pub database_url: String,
 }
 
 impl Config {
     pub fn address(&self) -> String {
-        format!("{}:{}", self.host, self.port)
+        format!("{}:{}", self.host_name, self.port)
     }
 }
 
