@@ -1,51 +1,52 @@
 use std::sync::Arc;
-use actix_files::Files;
-use actix_web::{middleware::Logger, web, App, HttpServer, Scope};
-use futures::executor::block_on;
-use sea_orm::{Database, DatabaseConnection};
+use sea_orm::DatabaseConnection;
+use tower_http::services::ServeDir;
+use axum::{
+    Router, handler::Handler, AddExtensionLayer,
+    routing::{get, get_service}
+};
+
 use crate::database::get_connection_pool;
 
 mod config;
 mod handlers;
 mod database;
 
-struct AppState {
-    database_connection: Arc<DatabaseConnection>,
+pub struct State {
+    database_connection: DatabaseConnection,
+    config: config::Config,
 }
 
-impl Default for AppState {
-    fn default() -> Self {
+impl State {
+    async fn new() -> Self {
         Self {
-            database_connection: Arc::new(block_on(Database::connect(config::Config::default().database_url)).expect("DATABASE CONNECTION"))
+            database_connection: get_connection_pool().await,
+            config: config::Config::default(),
         }
     }
 }
 
-fn initialize(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_scope())
-        .app_data(web::Data::new(AppState::default()));
+type AppState = Arc<State>;
+
+async fn create_app() -> Router {
+    let app_state: AppState = Arc::new(State::new().await);
+
+    Router::new()
+        .route("/graphql", get(handlers::graphql))
+        .route("/", get_service(ServeDir::new("frontend")).handle_error(|_: std::io::Error| handlers::handler_500()))
+        .fallback(handlers::handler_404.into_service())
+        .layer(AddExtensionLayer::new(app_state))
 }
 
-fn get_scope() -> Scope {
-    web::scope("")
-        .route("graphql", web::post().to(handlers::graphql))
-        .service(
-            Files::new("", "frontend")
-                .index_file("index.html")
-                .prefer_utf8(true)
-                .default_handler(web::to(handlers::handler_404)),
-        )
-}
-
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() {
     dotenv::dotenv().ok();
-    env_logger::init();
 
-    let config = config::Config::default();
+    let app = create_app().await;
+    let address = config::Config::default().address();
 
-    HttpServer::new(|| App::new().wrap(Logger::default()).configure(initialize))
-        .bind(config.address())?
-        .run()
+    axum::Server::bind(&address)
+        .serve(app.into_make_service())
         .await
+        .unwrap();
 }
