@@ -11,6 +11,9 @@ envy = "~0.4.2"
 serde = "~1.0"
 serde_derive = "~1.0"
 serde_json = "~1.0"
+chrono = "^0"
+time = "^0.3"
+uuid = { version = "^0", features = ["serde"] }
 
 [dependencies.tokio]
 version = "~1.17.0"
@@ -21,10 +24,27 @@ version = "~0.2.3"
 features = ["fs", "trace"]
 
 [dependencies.axum]
-version = "~0.4.6"
+version = "~0.5.0"
 featuers = ["json"]
 
-[dependencies.sea-orm]
-version = "~0.6.0"
+[dependencies.sqlx]
+version = "~0.5.0"
+features = [
+    "runtime-tokio-native-tls",
+    "macros",
+    "postgres",
+    "tls",
+    "chrono",
+    "uuid",
+    "time",
+]
+
+[dependencies.sea-query]
+version = "~0.23.0"
 default-features = false
-features = ["sqlx-postgres", "runtime-actix-native-tls", "macros"]
+features = [
+    "sqlx-postgres",
+    "with-chrono",
+    "with-uuid",
+    "with-time",
+]
