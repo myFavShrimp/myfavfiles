@@ -5,9 +5,11 @@ use axum::{
     routing::{get, get_service}
 };
 
+#[macro_use] mod entities;
 mod config;
 mod handlers;
 mod database;
+mod graphql;
 
 pub struct State {
     database_connection: database::DbPool,
