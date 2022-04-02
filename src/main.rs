@@ -9,7 +9,6 @@ use axum::{
 mod config;
 mod handlers;
 mod database;
-mod graphql;
 
 pub struct State {
     database_connection: database::DbPool,
@@ -40,6 +39,7 @@ async fn create_app() -> Router {
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
+    database::initialize_database().await;
 
     let app = create_app().await;
     let address = config::Config::default().address();
