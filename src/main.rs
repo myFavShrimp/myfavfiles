@@ -2,7 +2,7 @@ use std::sync::Arc;
 use tower_http::services::ServeDir;
 use axum::{
     Router, handler::Handler, Extension,
-    routing::{get, get_service}
+    routing::{get, get_service, post}
 };
 
 #[macro_use] mod entities;
@@ -13,6 +13,7 @@ mod database;
 pub struct State {
     database_connection: database::DbPool,
     config: config::Config,
+    graphql_root: handlers::graphql::Root,
 }
 
 impl State {
@@ -20,6 +21,7 @@ impl State {
         Self {
             database_connection: database::get_connection_pool().await,
             config: config::Config::default(),
+            graphql_root: handlers::graphql::create_root(),
         }
     }
 }
@@ -29,11 +31,15 @@ type AppState = Arc<State>;
 async fn create_app() -> Router {
     let app_state: AppState = Arc::new(State::new().await);
 
+    let api_router = Router::new()
+        .route("/graphql", post(handlers::graphql))
+        .route("/playground", get(handlers::playground))
+        .layer(Extension(app_state));
+
     Router::new()
-        .route("/graphql", get(handlers::graphql))
         .route("/", get_service(ServeDir::new("frontend")).handle_error(|_: std::io::Error| handlers::handler_500()))
+        .nest("/api", api_router)
         .fallback(handlers::handler_404.into_service())
-        .layer(Extension(app_state))
 }
 
 #[tokio::main]

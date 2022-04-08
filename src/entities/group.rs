@@ -1,13 +1,10 @@
 use uuid::Uuid;
 
-
 #[allow(dead_code)]
 pub enum Columns {
     Table,
     Id,
     Name,
-    Password,
-    IsAdmin,
 }
 
 crate::entities::macros::impl_iden!{
@@ -15,8 +12,6 @@ crate::entities::macros::impl_iden!{
     Table => "user",
     Id => "id",
     Name => "name",
-    Password => "password",
-    IsAdmin => "is_admin",
 }
 
 #[derive(sqlx::FromRow, Debug)]
@@ -24,6 +19,4 @@ crate::entities::macros::impl_iden!{
 pub struct Entity {
     id: Uuid,
     name: String,
-    password: String,
-    is_admin: bool,
 }
