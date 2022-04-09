@@ -1,10 +1,9 @@
 use std::{collections::HashMap, sync::Arc};
 
-use sea_query::{Query, PostgresQueryBuilder, Expr};
 use uuid::Uuid;
 
 use crate::{entities, handlers::graphql::Context};
-use super::{Loadable, sea_query_driver_postgres::bind_query_as};
+use super::{Loadable, sea_query_driver_postgres::bind_query_as, build_select_query};
 
 
 #[derive(Default)]
@@ -35,27 +34,16 @@ impl Loadable for UserLoader {
             None => None
         };
 
-        let (sql, values) = match ids_to_load {
-            Some(ids_to_load) => Query::select()
-                .columns(vec![
-                    entities::user::Columns::Id,
-                    entities::user::Columns::Name,
-                    entities::user::Columns::Password,
-                    entities::user::Columns::IsAdmin,
-                ])
-                .from(entities::user::Columns::Table)
-                .and_where(Expr::col(entities::user::Columns::Id).is_in(ids_to_load))
-                .build(PostgresQueryBuilder),
-            None => Query::select()
-                .columns(vec![
-                    entities::user::Columns::Id,
-                    entities::user::Columns::Name,
-                    entities::user::Columns::Password,
-                    entities::user::Columns::IsAdmin,
-                ])
-                .from(entities::user::Columns::Table)
-                .build(PostgresQueryBuilder),
-        };
+        let (sql, values) = build_select_query(
+            vec![
+                entities::user::Columns::Id,
+                entities::user::Columns::Name,
+                entities::user::Columns::Password,
+                entities::user::Columns::IsAdmin,
+            ], entities::user::Columns::Table, 
+            entities::user::Columns::Id, 
+            ids_to_load,
+        );
 
 
         let mut conn = ctx.app_state.clone().database_connection.try_acquire().unwrap();
