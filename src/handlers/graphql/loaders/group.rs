@@ -15,6 +15,7 @@ pub struct GroupLoader {
 impl Loadable for GroupLoader {
     type IdentifierType = Uuid;
     type LoadableType = entities::group::Entity;
+    type ColumnType = entities::group::Columns;
 
     async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Self::IdentifierType>>) -> Vec<Arc<Self::LoadableType>> {
         let mut results = Vec::new();
@@ -36,14 +37,8 @@ impl Loadable for GroupLoader {
             None => None
         };
 
-        let (sql, values) = build_select_query(
-            vec![
-                entities::group::Columns::Id,
-                entities::group::Columns::Name,
-            ], entities::group::Columns::Table, 
-            entities::group::Columns::Id, 
-            ids_to_load,
-        );
+        let (columns, id_column, table) = Self::get_query_columns();
+        let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
         let mut conn = ctx.app_state.clone().database_connection.try_acquire().unwrap();
         let query = bind_query_as(sqlx::query_as::<_, Self::LoadableType>(&sql), &values);
@@ -60,5 +55,15 @@ impl Loadable for GroupLoader {
 
     fn get_cache(&mut self) -> Cache<Self::IdentifierType,Arc<Self::LoadableType> >  {
         self.cache.clone()
+    }
+
+    fn get_query_columns() -> (Vec<Self::ColumnType>, Self::ColumnType, Self::ColumnType) {
+        (
+            vec![
+                Self::ColumnType::Id,
+                Self::ColumnType::Name,
+            ], Self::ColumnType::Id,
+            Self::ColumnType::Table
+        )
     }
 }

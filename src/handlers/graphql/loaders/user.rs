@@ -15,6 +15,7 @@ pub struct UserLoader {
 impl Loadable for UserLoader {
     type IdentifierType = Uuid;
     type LoadableType = entities::user::Entity;
+    type ColumnType = entities::user::Columns;
 
     async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Self::IdentifierType>>) -> Vec<Arc<Self::LoadableType>> {
         let mut results = Vec::new();
@@ -36,16 +37,8 @@ impl Loadable for UserLoader {
             None => None
         };
 
-        let (sql, values) = build_select_query(
-            vec![
-                entities::user::Columns::Id,
-                entities::user::Columns::Name,
-                entities::user::Columns::Password,
-                entities::user::Columns::IsAdmin,
-            ], entities::user::Columns::Table, 
-            entities::user::Columns::Id, 
-            ids_to_load,
-        );
+        let (columns, id_column, table) = Self::get_query_columns();
+        let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
         let mut conn = ctx.app_state.clone().database_connection.try_acquire().unwrap();
         let query = bind_query_as(sqlx::query_as::<_, Self::LoadableType>(&sql), &values);
@@ -62,5 +55,17 @@ impl Loadable for UserLoader {
 
     fn get_cache(&mut self) -> Cache<Self::IdentifierType,Arc<Self::LoadableType> >  {
         self.cache.clone()
+    }
+
+    fn get_query_columns() -> (Vec<Self::ColumnType>, Self::ColumnType, Self::ColumnType) {
+        (
+            vec![
+                Self::ColumnType::Id,
+                Self::ColumnType::Name,
+                Self::ColumnType::Password,
+                Self::ColumnType::IsAdmin,
+            ], Self::ColumnType::Id, 
+            Self::ColumnType::Table,
+        )
     }
 }

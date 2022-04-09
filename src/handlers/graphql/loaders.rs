@@ -22,10 +22,13 @@ pub type Cache<I, E> = Arc<Mutex<HashMap<I, E>>>;
 pub trait Loadable {
     type IdentifierType;
     type LoadableType;
-
-    async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Self::IdentifierType>>) -> Vec<Arc<Self::LoadableType>>;
+    type ColumnType;
 
     fn get_cache(&mut self) -> Cache<Self::IdentifierType, Arc<Self::LoadableType>>;
+
+    fn get_query_columns() -> (Vec<Self::ColumnType>, Self::ColumnType, Self::ColumnType);
+
+    async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Self::IdentifierType>>) -> Vec<Arc<Self::LoadableType>>;
 }
 
 pub fn build_select_query<E>(columns: Vec<E>, table: E, id_column: E, ids_to_load: Option<Vec<Uuid>>) -> (String, Values)
