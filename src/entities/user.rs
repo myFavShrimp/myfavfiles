@@ -19,11 +19,11 @@ crate::entities::macros::impl_iden!{
     IsAdmin => "is_admin",
 }
 
-#[derive(sqlx::FromRow, Debug)]
+#[derive(sqlx::FromRow, Debug, Clone, juniper::GraphQLObject)]
 #[allow(dead_code)]
 pub struct Entity {
-    id: Uuid,
-    name: String,
-    password: String,
-    is_admin: bool,
+    pub id: Uuid,
+    pub name: String,
+    pub password: String,
+    pub is_admin: bool,
 }

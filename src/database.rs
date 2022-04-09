@@ -1,4 +1,4 @@
-use sqlx::{PgPool, Pool, Postgres, migrate::{Migrator, MigrateDatabase}};
+use sqlx::{PgPool, Pool, Postgres, migrate::MigrateDatabase};
 
 use crate::config::Config;
 

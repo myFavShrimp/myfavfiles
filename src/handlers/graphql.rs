@@ -1,6 +1,7 @@
 use crate::AppState;
 
 pub mod query;
+pub mod loaders;
 
 
 pub struct Context {

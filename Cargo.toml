@@ -16,6 +16,7 @@ time = "^0.3"
 juniper = "~0.15.9"
 juniper_hyper = "~0.8.0"
 hyper = "~0.14.18"
+async-trait = "~0.1.53"
 
 [dependencies.uuid]
  version = "^0"
