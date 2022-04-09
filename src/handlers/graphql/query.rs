@@ -15,9 +15,15 @@ impl Query {
         context.app_state.as_ref().config.database_url.clone()
     }
 
-    async fn users(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+    async fn users(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = Loaders::default();
 
-        loaders.user.load_many(context, &[Uuid::nil()]).await
+        loaders.user.load_many(context, ids).await
+    }
+
+    async fn user(context: &Context, id: Uuid) -> Option<Arc<entities::user::Entity>> {
+        let mut loaders = Loaders::default();
+
+        loaders.user.load_many(context, Some(vec![id])).await.pop()
     }
 }
