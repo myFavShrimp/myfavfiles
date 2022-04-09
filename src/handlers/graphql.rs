@@ -1,4 +1,10 @@
+use std::sync::Arc;
+
+use tokio::sync::Mutex;
+
 use crate::AppState;
+
+use self::loaders::Loaders;
 
 pub mod query;
 pub mod loaders;
@@ -6,6 +12,7 @@ pub mod loaders;
 
 pub struct Context {
     pub app_state: AppState,
+    pub loaders: Arc<Mutex<Loaders>>
 }
 
 impl juniper::Context for Context {}

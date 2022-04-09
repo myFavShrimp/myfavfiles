@@ -1,6 +1,11 @@
+use std::sync::Arc;
+
 use axum::{http::{StatusCode, Request}, response::IntoResponse, extract::Extension, body::Body};
+use tokio::sync::Mutex;
 
 use crate::AppState;
+
+use self::graphql::loaders::Loaders;
 
 pub mod graphql;
 
@@ -8,6 +13,7 @@ pub mod graphql;
 pub async fn graphql(Extension(ref state): Extension<AppState>, req: Request<Body>) -> impl IntoResponse {
     let context = std::sync::Arc::new(graphql::Context {
         app_state: state.clone(),
+        loaders: Arc::new(Mutex::new(Loaders::default())),
     });
 
     juniper_hyper::graphql(state.graphql_root.clone(), context, req).await

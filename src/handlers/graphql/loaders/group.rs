@@ -7,14 +7,14 @@ use super::{Loadable, sea_query_driver_postgres::bind_query_as, build_select_que
 
 
 #[derive(Default)]
-pub struct UserLoader {
-    pub cache: Cache<Uuid, Arc<entities::user::Entity>>,
+pub struct GroupLoader {
+    pub cache: Cache<Uuid, Arc<entities::group::Entity>>,
 }
 
 #[async_trait::async_trait]
-impl Loadable for UserLoader {
+impl Loadable for GroupLoader {
     type IdentifierType = Uuid;
-    type LoadableType = entities::user::Entity;
+    type LoadableType = entities::group::Entity;
 
     async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Self::IdentifierType>>) -> Vec<Arc<Self::LoadableType>> {
         let mut results = Vec::new();
@@ -38,12 +38,10 @@ impl Loadable for UserLoader {
 
         let (sql, values) = build_select_query(
             vec![
-                entities::user::Columns::Id,
-                entities::user::Columns::Name,
-                entities::user::Columns::Password,
-                entities::user::Columns::IsAdmin,
-            ], entities::user::Columns::Table, 
-            entities::user::Columns::Id, 
+                entities::group::Columns::Id,
+                entities::group::Columns::Name,
+            ], entities::group::Columns::Table, 
+            entities::group::Columns::Id, 
             ids_to_load,
         );
 

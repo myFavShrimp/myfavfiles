@@ -9,14 +9,14 @@ pub enum Columns {
 
 crate::entities::macros::impl_iden!{
     Columns,
-    Table => "user",
+    Table => "group",
     Id => "id",
     Name => "name",
 }
 
-#[derive(sqlx::FromRow, Debug)]
+#[derive(sqlx::FromRow, Debug, Clone, juniper::GraphQLObject)]
 #[allow(dead_code)]
 pub struct Entity {
-    id: Uuid,
-    name: String,
+    pub id: Uuid,
+    pub name: String,
 }
