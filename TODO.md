@@ -1,0 +1,2 @@
+- make nested queries only query relational objects
+- prefetch ids to use cache efficiently
