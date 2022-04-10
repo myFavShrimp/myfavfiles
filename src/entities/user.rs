@@ -2,7 +2,6 @@ use uuid::Uuid;
 
 use crate::handlers::graphql::loaders::GetId;
 
-
 #[allow(dead_code)]
 pub enum Columns {
     Table,
@@ -12,7 +11,7 @@ pub enum Columns {
     IsAdmin,
 }
 
-crate::entities::macros::impl_iden!{
+crate::entities::macros::impl_iden! {
     Columns,
     Table => "user",
     Id => "id",

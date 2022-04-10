@@ -1,14 +1,16 @@
+use axum::{
+    handler::Handler,
+    routing::{get, get_service, post},
+    Extension, Router,
+};
 use std::sync::Arc;
 use tower_http::services::ServeDir;
-use axum::{
-    Router, handler::Handler, Extension,
-    routing::{get, get_service, post}
-};
 
-#[macro_use] mod entities;
+#[macro_use]
+mod entities;
 mod config;
-mod handlers;
 mod database;
+mod handlers;
 
 pub struct State {
     database_connection: database::DbPool,
@@ -37,7 +39,11 @@ async fn create_app() -> Router {
         .layer(Extension(app_state));
 
     Router::new()
-        .route("/", get_service(ServeDir::new("frontend")).handle_error(|_: std::io::Error| handlers::handler_500()))
+        .route(
+            "/",
+            get_service(ServeDir::new("frontend"))
+                .handle_error(|_: std::io::Error| handlers::handler_500()),
+        )
         .nest("/api", api_router)
         .fallback(handlers::handler_404.into_service())
 }

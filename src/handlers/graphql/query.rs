@@ -6,7 +6,6 @@ use crate::{entities, handlers::graphql::loaders::Loadable};
 
 use super::Context;
 
-
 pub struct Query;
 
 #[juniper::graphql_object(context = Context)]
@@ -27,7 +26,10 @@ impl Query {
         loaders.user.load_many(context, Some(vec![id])).await.pop()
     }
 
-    async fn groups(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::group::Entity>> {
+    async fn groups(
+        context: &Context,
+        ids: Option<Vec<Uuid>>,
+    ) -> Vec<Arc<entities::group::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         loaders.group.load_many(context, ids).await

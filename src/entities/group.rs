@@ -9,7 +9,7 @@ pub enum Columns {
     Name,
 }
 
-crate::entities::macros::impl_iden!{
+crate::entities::macros::impl_iden! {
     Columns,
     Table => "group",
     Id => "id",

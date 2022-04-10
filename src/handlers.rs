@@ -1,6 +1,11 @@
 use std::sync::Arc;
 
-use axum::{http::{StatusCode, Request}, response::IntoResponse, extract::Extension, body::Body};
+use axum::{
+    body::Body,
+    extract::Extension,
+    http::{Request, StatusCode},
+    response::IntoResponse,
+};
 use tokio::sync::Mutex;
 
 use crate::AppState;
@@ -9,8 +14,10 @@ use self::graphql::loaders::Loaders;
 
 pub mod graphql;
 
-
-pub async fn graphql(Extension(ref state): Extension<AppState>, req: Request<Body>) -> impl IntoResponse {
+pub async fn graphql(
+    Extension(ref state): Extension<AppState>,
+    req: Request<Body>,
+) -> impl IntoResponse {
     let context = std::sync::Arc::new(graphql::Context {
         app_state: state.clone(),
         loaders: Arc::new(Mutex::new(Loaders::default())),

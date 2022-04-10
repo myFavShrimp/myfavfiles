@@ -1,5 +1,5 @@
-use std::net::SocketAddr;
 use serde_derive::Deserialize;
+use std::net::SocketAddr;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -10,7 +10,9 @@ pub struct Config {
 
 impl Config {
     pub fn address(&self) -> SocketAddr {
-        format!("{}:{}", self.host_name, self.port).parse().expect("address")
+        format!("{}:{}", self.host_name, self.port)
+            .parse()
+            .expect("address")
     }
 }
 
