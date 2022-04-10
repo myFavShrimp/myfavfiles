@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use uuid::Uuid;
 
 use super::{Cache, Loadable};
@@ -7,12 +5,12 @@ use crate::entities;
 
 #[derive(Default)]
 pub struct UserLoader {
-    pub cache: Cache<Uuid, Arc<entities::user::Entity>>,
+    pub cache: Cache<Uuid, entities::user::Entity>,
 }
 
 #[async_trait::async_trait]
 impl Loadable<entities::user::Entity, entities::user::Columns> for UserLoader {
-    fn get_cache(&mut self) -> Cache<Uuid, Arc<entities::user::Entity>> {
+    fn get_cache(&mut self) -> Cache<Uuid, entities::user::Entity> {
         self.cache.clone()
     }
 

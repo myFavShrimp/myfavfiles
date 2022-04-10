@@ -19,17 +19,16 @@ pub struct Loaders {
     pub group: group::GroupLoader,
 }
 
-pub type Cache<I, E> = Arc<Mutex<HashMap<I, E>>>;
+pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
 
 #[async_trait::async_trait]
 pub trait Loadable<LoadableType, ColumnType>
 where
-    LoadableType:
-        Clone + for<'r> FromRow<'r, PgRow> + std::marker::Send + Unpin + GetId + std::marker::Sync,
+    LoadableType: Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + GetId + Sync,
     sea_query::Value: From<Uuid>,
-    ColumnType: Iden + std::marker::Send + 'static,
+    ColumnType: Iden + Send + 'static,
 {
-    fn get_cache(&mut self) -> Cache<Uuid, Arc<LoadableType>>;
+    fn get_cache(&mut self) -> Cache<Uuid, LoadableType>;
 
     fn get_query_columns() -> (Vec<ColumnType>, ColumnType, ColumnType);
 
@@ -68,7 +67,8 @@ where
             .app_state
             .clone()
             .database_connection
-            .try_acquire()
+            .acquire()
+            .await
             .unwrap();
         let query = bind_query_as(sqlx::query_as::<_, LoadableType>(&sql), &values);
         if let Ok(rows) = query.fetch_all(&mut conn).await {
