@@ -1,5 +1,7 @@
 use uuid::Uuid;
 
+use crate::handlers::graphql::loaders::GetId;
+
 #[allow(dead_code)]
 pub enum Columns {
     Table,
@@ -19,4 +21,10 @@ crate::entities::macros::impl_iden!{
 pub struct Entity {
     pub id: Uuid,
     pub name: String,
+}
+
+impl GetId for Entity {
+    fn get_id(&self) -> Uuid {
+        self.id
+    }
 }
