@@ -4,9 +4,9 @@ use crate::config::Config;
 
 pub type DbPool = Pool<Postgres>;
 
-pub const DATABASE_CONNECTION_ERROR_MESSAGE: &'static str = "Could not connect to the database.";
-pub const DATABASE_MIGRATION_ERROR_MESSAGE: &'static str = "Could not apply database migrations.";
-pub const DATABASE_CREATION_ERROR_MESSAGE: &'static str = "Could not create the database.";
+pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the database.";
+pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database migrations.";
+pub const DATABASE_CREATION_ERROR_MESSAGE: &str = "Could not create the database.";
 
 pub async fn get_connection_pool() -> DbPool {
     PgPool::connect(&Config::default().database_url)

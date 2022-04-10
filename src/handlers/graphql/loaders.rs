@@ -37,18 +37,15 @@ where
         let mut _cache = self.get_cache();
         let mut cache = _cache.lock().await;
 
-        let ids_to_load = match ids {
-            Some(ids) => Some(ids.iter().fold(Vec::new(), |mut acc, id| {
-                if let Some(item) = cache.get(id) {
-                    results.push(item.clone())
-                } else {
-                    acc.push(id.clone());
-                }
+        let ids_to_load = ids.map(|ids| ids.iter().fold(Vec::new(), |mut acc, id| {
+            if let Some(item) = cache.get(id) {
+                results.push(item.clone())
+            } else {
+                acc.push(*id);
+            }
 
-                acc
-            })),
-            None => None,
-        };
+            acc
+        }));
 
         let (columns, id_column, table) = Self::get_query_columns();
         let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
