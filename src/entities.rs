@@ -1,5 +1,6 @@
 pub mod group;
 pub mod user;
+pub mod group_member;
 
 mod macros {
     #[macro_export]
