@@ -9,7 +9,7 @@ use crate::handlers::graphql::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 
-use super::entities::{IdEntity, TableEntity};
+use super::entities::{IdEntity, RelationColumn, TableEntity};
 
 sea_query::sea_query_driver_postgres!();
 
@@ -124,7 +124,7 @@ pub trait Identifiable {
 }
 
 #[async_trait::async_trait]
-pub trait LoadableRelationOneToOne<LoadableType, ColumnType, OtherColumnType>:
+pub trait LoadableRelationOneToMany<LoadableType, ColumnType, OtherColumnType>:
     Loadable<LoadableType, ColumnType>
 where
     LoadableType: Clone
@@ -134,11 +134,9 @@ where
         + Identifiable
         + Sync
         + TableEntity<ColumnType>,
-    ColumnType: Iden + Send + 'static,
+    ColumnType: Iden + Send + 'static + RelationColumn<OtherColumnType, ColumnType>,
     OtherColumnType: Iden + Send + 'static,
 {
-    fn related_column() -> ColumnType;
-
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
         let mut conn = ctx
             .app_state
@@ -163,10 +161,62 @@ where
         let id_column = LoadableType::id_column();
         let table = LoadableType::table();
 
-        let (sql, values) =
-            build_select_query(vec![id_column], table, Self::related_column(), Some(ids));
+        let (sql, values) = build_select_query(
+            vec![id_column],
+            table,
+            ColumnType::get_relation_id_column(),
+            Some(ids),
+        );
         let relational_ids = Self::query_ids(ctx, sql, values).await;
 
         self.load_many(ctx, Some(relational_ids)).await
     }
 }
+
+// #[async_trait::async_trait]
+// pub trait LoadableRelationOneToMany<LoadableType, ColumnType, OtherColumnType>:
+//     Loadable<LoadableType, ColumnType>
+// where
+//     LoadableType: Clone
+//         + for<'r> FromRow<'r, PgRow>
+//         + Send
+//         + Unpin
+//         + Identifiable
+//         + Sync
+//         + TableEntity<ColumnType>,
+//     ColumnType: Iden + Send + 'static,
+//     OtherColumnType: Iden + Send + 'static,
+// {
+//     fn related_column() -> OtherColumnType;
+
+//     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
+//         let mut conn = ctx
+//             .app_state
+//             .clone()
+//             .database_connection
+//             .acquire()
+//             .await
+//             .unwrap();
+//         let query = bind_query_as(sqlx::query_as::<_, IdEntity>(&sql), &values);
+//         if let Ok(rows) = query.fetch_all(&mut conn).await {
+//             rows.iter().fold(Vec::new(), |mut acc, item| {
+//                 acc.push(item.id.clone());
+
+//                 acc
+//             })
+//         } else {
+//             Vec::new()
+//         }
+//     }
+
+//     async fn load_many_related(&mut self, ctx: &Context, ids: Vec<Uuid>) -> Vec<Arc<LoadableType>> {
+//         let id_column = LoadableType::id_column();
+//         let table = LoadableType::table();
+
+//         let (sql, values) =
+//             build_select_query(vec![id_column], table, Self::related_column(), Some(ids));
+//         let relational_ids = Self::query_ids(ctx, sql, values).await;
+
+//         self.load_many(ctx, Some(relational_ids)).await
+//     }
+// }

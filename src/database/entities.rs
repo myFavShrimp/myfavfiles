@@ -46,10 +46,8 @@ where
     fn table() -> ColumnType;
 }
 
-pub trait RelationOneToOne<OtherEntity, OtherColumnType, ColumnType>
+pub trait RelationColumn<OtherColumnType, ColumnType>
 where
-    OtherEntity: TableEntity<OtherColumnType>,
-    Self: TableEntity<ColumnType>,
     OtherColumnType: Iden,
     ColumnType: Iden,
 {

@@ -27,12 +27,18 @@ impl entities::group_member::Entity {
     async fn group(context: &Context) -> Vec<Arc<entities::group::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
-        loaders.group.load_many(context, Some(vec![self.group_id])).await
+        loaders
+            .group
+            .load_many(context, Some(vec![self.group_id]))
+            .await
     }
 
     async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
-        loaders.user.load_many(context, Some(vec![self.user_id])).await
+        loaders
+            .user
+            .load_many(context, Some(vec![self.user_id]))
+            .await
     }
 }
