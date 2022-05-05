@@ -2,11 +2,9 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use crate::AppState;
+use crate::{database::loaders::Loaders, AppState};
 
-use self::loaders::Loaders;
-
-pub mod loaders;
+mod object;
 pub mod query;
 
 pub struct Context {

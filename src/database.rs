@@ -2,6 +2,10 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
 use crate::config::Config;
 
+#[macro_use]
+pub mod entities;
+pub mod loaders;
+
 pub type DbPool = Pool<Postgres>;
 
 pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the database.";

@@ -8,9 +8,7 @@ use axum::{
 };
 use tokio::sync::Mutex;
 
-use crate::AppState;
-
-use self::graphql::loaders::Loaders;
+use crate::{database::loaders::Loaders, AppState};
 
 pub mod graphql;
 

@@ -7,9 +7,8 @@ use std::sync::Arc;
 use tower_http::services::ServeDir;
 
 #[macro_use]
-mod entities;
-mod config;
 mod database;
+mod config;
 mod handlers;
 
 pub struct State {
