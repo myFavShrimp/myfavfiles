@@ -10,10 +10,6 @@ pub struct Query;
 
 #[juniper::graphql_object(context = Context)]
 impl Query {
-    fn hello(context: &Context) -> String {
-        context.app_state.as_ref().config.database_url.clone()
-    }
-
     async fn users(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
 

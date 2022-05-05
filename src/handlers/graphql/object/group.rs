@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::Loadable};
+use crate::database::{entities, loaders::{Loadable, LoadableRelationOneToMany}};
 
 #[graphql_object(Context = Context, name = "Group")]
 impl entities::group::Entity {
@@ -16,9 +16,14 @@ impl entities::group::Entity {
         &self.name
     }
 
-    async fn user(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::user::Entity>> {
+    async fn group_member(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
-        loaders.user.load_many(context, ids).await
+        LoadableRelationOneToMany::<
+            entities::group_member::Entity,
+            entities::group_member::Columns,
+            entities::group::Columns,
+        >::load_many_related(&mut loaders.group_member, context, vec![self.id])
+        .await
     }
 }
