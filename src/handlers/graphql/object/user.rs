@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::super::Context;
 use crate::database::{
     entities,
-    loaders::{group_member::GroupMemberLoader, Loadable, LoadableRelationOneToOne},
+    loaders::LoadableRelationOneToOne,
 };
 
 #[graphql_object(Context = Context, name = "User")]

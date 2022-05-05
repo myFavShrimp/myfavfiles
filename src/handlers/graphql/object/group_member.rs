@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::{Loadable, LoadableRelationOneToOne}};
+use crate::database::{entities, loaders::Loadable};
 
 #[graphql_object(Context = Context, name = "GroupMember")]
 impl entities::group_member::Entity {

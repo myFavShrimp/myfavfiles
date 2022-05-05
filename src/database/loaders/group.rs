@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use super::{Cache, Loadable, LoadableRelationOneToOne};
+use super::{Cache, Loadable};
 use crate::database::entities;
 
 #[derive(Default)]
