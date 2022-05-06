@@ -1,4 +1,4 @@
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use std::net::SocketAddr;
 
 #[derive(Deserialize)]
@@ -18,6 +18,7 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
+        dotenv::dotenv().ok();
         envy::from_env::<Config>().expect("load config")
     }
 }

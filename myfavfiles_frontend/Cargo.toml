@@ -1,0 +1,28 @@
+[package]
+name = "myfavfiles_frontend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "myfavfiles_frontend"
+
+[[bin]]
+name = "myfavfiles_frontend"
+
+[dependencies]
+myfavfiles_common = { path = "../myfavfiles_common" }
+axum = "0.5.0"
+
+[dependencies.axum-extra]
+version = "0.3.0"
+features = ["spa"]
+
+[dependencies.tower-http]
+version = "0.3.2"
+features = ["fs", "trace"]
+
+[dependencies.tokio]
+version = "1.18.1"
+features = ["full"]

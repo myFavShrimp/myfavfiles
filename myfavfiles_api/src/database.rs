@@ -1,6 +1,6 @@
 use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
-use crate::config::Config;
+use myfavfiles_common::config::Config;
 
 #[macro_use]
 pub mod entities;
@@ -12,7 +12,7 @@ pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the da
 pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database migrations.";
 pub const DATABASE_CREATION_ERROR_MESSAGE: &str = "Could not create the database.";
 
-pub async fn get_connection_pool() -> DbPool {
+pub async fn connection_pool() -> DbPool {
     PgPool::connect(&Config::default().database_url)
         .await
         .expect(DATABASE_CONNECTION_ERROR_MESSAGE)
@@ -36,8 +36,8 @@ async fn create_database_if_not_exists() {
 }
 
 async fn apply_migrations() {
-    let pool = get_connection_pool().await;
-    sqlx::migrate!()
+    let pool = connection_pool().await;
+    sqlx::migrate!("../migrations")
         .run(&pool)
         .await
         .expect(DATABASE_MIGRATION_ERROR_MESSAGE);

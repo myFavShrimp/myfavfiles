@@ -1,0 +1,52 @@
+[package]
+name = "myfavfiles_api"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "myfavfiles_api"
+
+[[bin]]
+name = "myfavfiles_api"
+
+[dependencies]
+myfavfiles_common = { path = "../myfavfiles_common" }
+envy = "0.4.2"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+chrono = "0"
+time = "0.3"
+juniper = "0.15.9"
+juniper_hyper = "0.8.0"
+hyper = "0.14.18"
+async-trait = "0.1.53"
+axum = "0.5.0"
+
+[dependencies.uuid]
+ version = "0"
+ features = ["serde"]
+
+[dependencies.tokio]
+version = "1.18.1"
+features = ["full"]
+
+[dependencies.sqlx]
+version = "0.5.13"
+features = [
+    "runtime-tokio-native-tls",
+    "macros",
+    "postgres",
+    "tls",
+    "chrono",
+    "uuid",
+]
+
+[dependencies.sea-query]
+version = "0.24.4"
+features = [
+    "sqlx-postgres",
+    "with-chrono",
+    "with-uuid",
+    "derive",
+]
