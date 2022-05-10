@@ -91,23 +91,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-extra"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a00a7085c512df12d4e07a862b23a3b3bfe5326ecfc4185b49fb15c8850ba406"
-dependencies = [
- "axum",
- "bytes",
- "http",
- "mime",
- "pin-project-lite",
- "tower",
- "tower-http",
- "tower-layer",
- "tower-service",
-]
-
-[[package]]
 name = "base64"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -925,9 +908,9 @@ name = "myfavfiles_frontend"
 version = "0.1.0"
 dependencies = [
  "axum",
- "axum-extra",
  "myfavfiles_common",
  "tokio",
+ "tower",
  "tower-http",
 ]
 

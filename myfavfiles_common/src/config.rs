@@ -6,6 +6,7 @@ pub struct Config {
     host_name: String,
     port: u16,
     pub database_url: String,
+    pub frontend_path: String,
 }
 
 impl Config {
