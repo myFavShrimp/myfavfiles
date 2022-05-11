@@ -11,7 +11,7 @@ pub enum Columns {
     IsAdmin,
 }
 
-entities::macros::impl_iden! {
+impl_iden! {
     Columns,
     Table => "user",
     Id => "id",

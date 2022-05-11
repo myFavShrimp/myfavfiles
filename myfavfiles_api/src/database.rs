@@ -3,6 +3,7 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 use myfavfiles_common::config::Config;
 
 #[macro_use]
+mod macros;
 pub mod entities;
 pub mod loaders;
 

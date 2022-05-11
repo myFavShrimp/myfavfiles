@@ -11,7 +11,7 @@ pub enum Columns {
     IsAdmin,
 }
 
-crate::database::entities::macros::impl_iden! {
+impl_iden! {
     Columns,
     Table => "group_member",
     Id => "id",
