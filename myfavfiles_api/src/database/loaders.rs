@@ -65,7 +65,9 @@ where
         let table = LoadableEntity::table();
         let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
-        Self::query(ctx, sql, values).await.iter().for_each(|item| {
+        let conn = ctx.database_connection().await.unwrap();
+
+        Self::query(conn, sql, values).await.iter().for_each(|item| {
             let arc_item = Arc::new(item.clone());
             cache.insert(arc_item.id(), arc_item.clone());
             results.push(arc_item);
@@ -74,14 +76,7 @@ where
         results
     }
 
-    async fn query(ctx: &Context, sql: String, values: Values) -> Vec<LoadableEntity> {
-        let mut conn = ctx
-            .app_state
-            .clone()
-            .database_connection
-            .acquire()
-            .await
-            .unwrap();
+    async fn query(mut conn: super::PoolConnection, sql: String, values: Values) -> Vec<LoadableEntity> {
         let query = bind_query_as(sqlx::query_as::<_, LoadableEntity>(&sql), &values);
         if let Ok(rows) = query.fetch_all(&mut conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
@@ -134,16 +129,11 @@ where
         + Identifiable
         + Sync
         + TableEntity<ColumnsEnum>,
-    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum, ColumnsEnum>,
+    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherColumnsEnum: Iden + Send + 'static,
 {
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
-        let mut conn = ctx
-            .app_state
-            .clone()
-            .database_connection
-            .acquire()
-            .await
+        let mut conn = ctx.database_connection().await
             .unwrap();
         let query = bind_query_as(sqlx::query_as::<_, IdEntity>(&sql), &values);
         if let Ok(rows) = query.fetch_all(&mut conn).await {
@@ -164,7 +154,7 @@ where
         let (sql, values) = build_select_query(
             vec![id_column],
             table,
-            ColumnsEnum::get_relation_id_column(),
+            ColumnsEnum::relation_id_column(),
             Some(ids),
         );
         let relational_ids = Self::query_ids(ctx, sql, values).await;
@@ -184,7 +174,7 @@ where
         + Identifiable
         + Sync
         + TableEntity<ColumnsEnum>,
-    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum, ColumnsEnum>,
+    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherLoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
         + Send
@@ -194,7 +184,7 @@ where
         + TableEntity<OtherColumnsEnum>,
     OtherColumnsEnum: Iden + Send + 'static,
     {
-    async fn load_many_related(&mut self, ctx: &Context, ids: Vec<Uuid>) -> Vec<Arc<LoadableEntity>> {
+    async fn load_many_related(&mut self, _ctx: &Context, _ids: Vec<Uuid>) -> Vec<Arc<LoadableEntity>> {
         panic!("Not implemented!");
     }
 }

@@ -8,6 +8,7 @@ pub mod entities;
 pub mod loaders;
 
 pub type DbPool = Pool<Postgres>;
+pub type PoolConnection = sqlx::pool::PoolConnection<Postgres>;
 
 pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the database.";
 pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database migrations.";

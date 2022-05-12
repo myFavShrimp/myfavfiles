@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Identifiable};
+use crate::{database::loaders::Identifiable};
 
 columns! {
     Table => "user",

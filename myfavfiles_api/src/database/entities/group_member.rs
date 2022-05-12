@@ -44,14 +44,14 @@ impl super::TableEntity<Columns> for Entity {
     }
 }
 
-impl super::RelationColumn<entities::user::Columns, Columns> for Columns {
-    fn get_relation_id_column() -> Columns {
+impl super::RelationColumn<entities::user::Columns> for Columns {
+    fn relation_id_column() -> Columns {
         Columns::UserId
     }
 }
 
-impl super::RelationColumn<entities::group::Columns, Columns> for Columns {
-    fn get_relation_id_column() -> Columns {
+impl super::RelationColumn<entities::group::Columns> for Columns {
+    fn relation_id_column() -> Columns {
         Columns::GroupId
     }
 }

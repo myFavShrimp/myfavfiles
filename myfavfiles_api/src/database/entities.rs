@@ -1,4 +1,3 @@
-use sea_query::Iden;
 use uuid::Uuid;
 
 pub mod group;
@@ -20,6 +19,6 @@ pub trait TableEntity<ColumnsEnum> {
     fn table() -> ColumnsEnum;
 }
 
-pub trait RelationColumn<OtherColumnsEnum, ColumnsEnum> {
-    fn get_relation_id_column() -> ColumnsEnum;
+pub trait RelationColumn<OtherColumnsEnum> {
+    fn relation_id_column() -> Self;
 }

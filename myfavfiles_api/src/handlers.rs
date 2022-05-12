@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{
     body::Body,
     extract::Extension,
-    http::{Request, StatusCode},
+    http::Request,
     response::IntoResponse,
 };
 use tokio::sync::Mutex;
