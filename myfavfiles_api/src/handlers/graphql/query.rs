@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Loadable};
+use crate::{database::entities, database::loaders::Loader};
 
 use super::Context;
 

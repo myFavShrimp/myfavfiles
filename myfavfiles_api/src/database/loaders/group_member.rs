@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use super::{Cache, Loadable, LoadableRelationOneToMany};
+use super::{Cache, Loader, LoadableRelationOneToMany};
 use crate::database::entities;
 
 #[derive(Default)]
@@ -9,7 +9,7 @@ pub struct GroupMemberLoader {
 }
 
 #[async_trait::async_trait]
-impl Loadable<entities::group_member::Entity, entities::group_member::Columns>
+impl Loader<entities::group_member::Entity, entities::group_member::Columns>
     for GroupMemberLoader
 {
     fn cache(&mut self) -> Cache<Uuid, entities::group_member::Entity> {

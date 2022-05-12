@@ -27,21 +27,21 @@ pub struct Loaders {
 pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
 
 #[async_trait::async_trait]
-pub trait Loadable<LoadableType, ColumnType>
+pub trait Loader<LoadableEntity, ColumnsEnum>
 where
-    LoadableType: Clone
+    LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
         + Send
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<ColumnType>,
+        + TableEntity<ColumnsEnum>,
     sea_query::Value: From<Uuid>,
-    ColumnType: Iden + Send + 'static,
+    ColumnsEnum: Iden + Send + 'static,
 {
-    fn cache(&mut self) -> Cache<Uuid, LoadableType>;
+    fn cache(&mut self) -> Cache<Uuid, LoadableEntity>;
 
-    async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<LoadableType>> {
+    async fn load_many(&mut self, ctx: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<LoadableEntity>> {
         let mut results = Vec::new();
         let mut _cache = self.cache();
         let mut cache = _cache.lock().await;
@@ -60,9 +60,9 @@ where
             })
         });
 
-        let columns = LoadableType::all_columns();
-        let id_column = LoadableType::id_column();
-        let table = LoadableType::table();
+        let columns = LoadableEntity::all_columns();
+        let id_column = LoadableEntity::id_column();
+        let table = LoadableEntity::table();
         let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
         Self::query(ctx, sql, values).await.iter().for_each(|item| {
@@ -74,7 +74,7 @@ where
         results
     }
 
-    async fn query(ctx: &Context, sql: String, values: Values) -> Vec<LoadableType> {
+    async fn query(ctx: &Context, sql: String, values: Values) -> Vec<LoadableEntity> {
         let mut conn = ctx
             .app_state
             .clone()
@@ -82,7 +82,7 @@ where
             .acquire()
             .await
             .unwrap();
-        let query = bind_query_as(sqlx::query_as::<_, LoadableType>(&sql), &values);
+        let query = bind_query_as(sqlx::query_as::<_, LoadableEntity>(&sql), &values);
         if let Ok(rows) = query.fetch_all(&mut conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
                 acc.push(item.clone());
@@ -95,16 +95,16 @@ where
     }
 }
 
-fn build_select_query<ColumnType, IdType, ColumnTypeId>(
-    columns: Vec<ColumnType>,
-    table: ColumnType,
-    id_column: ColumnTypeId,
+fn build_select_query<ColumnsEnum, IdType, ColumnsEnumId>(
+    columns: Vec<ColumnsEnum>,
+    table: ColumnsEnum,
+    id_column: ColumnsEnumId,
     ids_to_load: Option<Vec<IdType>>,
 ) -> (String, Values)
 where
-    ColumnType: Iden + 'static,
+    ColumnsEnum: Iden + 'static,
     IdType: Into<Value>,
-    ColumnTypeId: Iden + 'static,
+    ColumnsEnumId: Iden + 'static,
 {
     match ids_to_load {
         Some(ids_to_load) => Query::select()
@@ -124,18 +124,18 @@ pub trait Identifiable {
 }
 
 #[async_trait::async_trait]
-pub trait LoadableRelationOneToMany<LoadableType, ColumnType, OtherColumnType>:
-    Loadable<LoadableType, ColumnType>
+pub trait LoadableRelationOneToMany<LoadableEntity, ColumnsEnum, OtherColumnsEnum>:
+    Loader<LoadableEntity, ColumnsEnum>
 where
-    LoadableType: Clone
+    LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
         + Send
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<ColumnType>,
-    ColumnType: Iden + Send + 'static + RelationColumn<OtherColumnType, ColumnType>,
-    OtherColumnType: Iden + Send + 'static,
+        + TableEntity<ColumnsEnum>,
+    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum, ColumnsEnum>,
+    OtherColumnsEnum: Iden + Send + 'static,
 {
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
         let mut conn = ctx
@@ -157,18 +157,44 @@ where
         }
     }
 
-    async fn load_many_related(&mut self, ctx: &Context, ids: Vec<Uuid>) -> Vec<Arc<LoadableType>> {
-        let id_column = LoadableType::id_column();
-        let table = LoadableType::table();
+    async fn load_many_related(&mut self, ctx: &Context, ids: Vec<Uuid>) -> Vec<Arc<LoadableEntity>> {
+        let id_column = LoadableEntity::id_column();
+        let table = LoadableEntity::table();
 
         let (sql, values) = build_select_query(
             vec![id_column],
             table,
-            ColumnType::get_relation_id_column(),
+            ColumnsEnum::get_relation_id_column(),
             Some(ids),
         );
         let relational_ids = Self::query_ids(ctx, sql, values).await;
 
         self.load_many(ctx, Some(relational_ids)).await
+    }
+}
+
+
+#[async_trait::async_trait]
+pub trait LoadableRelationManyToMany<LoadableEntity, ColumnsEnum, OtherLoadableEntity, OtherColumnsEnum>: Loader<LoadableEntity, ColumnsEnum>
+where
+    LoadableEntity: Clone
+        + for<'r> FromRow<'r, PgRow>
+        + Send
+        + Unpin
+        + Identifiable
+        + Sync
+        + TableEntity<ColumnsEnum>,
+    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum, ColumnsEnum>,
+    OtherLoadableEntity: Clone
+        + for<'r> FromRow<'r, PgRow>
+        + Send
+        + Unpin
+        + Identifiable
+        + Sync
+        + TableEntity<OtherColumnsEnum>,
+    OtherColumnsEnum: Iden + Send + 'static,
+    {
+    async fn load_many_related(&mut self, ctx: &Context, ids: Vec<Uuid>) -> Vec<Arc<LoadableEntity>> {
+        panic!("Not implemented!");
     }
 }

@@ -34,7 +34,7 @@ features = ["full"]
 [dependencies.sqlx]
 version = "0.5.13"
 features = [
-    "runtime-tokio-native-tls",
+    "runtime-tokio-rustls",
     "macros",
     "postgres",
     "tls",

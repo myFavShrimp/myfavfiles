@@ -1,8 +1,12 @@
-macro_rules! impl_iden {
-    ($enum: ty, $($x: ident => $y: literal,)+) => {
+macro_rules! columns {
+    ($($x: ident => $y: literal,)+) => {
         use sea_query::Iden;
 
-        impl Iden for $enum {
+        pub enum Columns {
+            $($x,)+
+        }
+
+        impl Iden for Columns {
             fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                 write!(
                     s,

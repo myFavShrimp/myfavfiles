@@ -4,6 +4,7 @@ use uuid::Uuid;
 pub mod group;
 pub mod group_member;
 pub mod user;
+pub mod platform_role;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]
@@ -11,21 +12,14 @@ pub struct IdEntity {
     pub id: Uuid,
 }
 
-pub trait TableEntity<ColumnType>
-where
-    ColumnType: sea_query::Iden,
-{
-    fn all_columns() -> Vec<ColumnType>;
+pub trait TableEntity<ColumnsEnum> {
+    fn all_columns() -> Vec<ColumnsEnum>;
 
-    fn id_column() -> ColumnType;
+    fn id_column() -> ColumnsEnum;
 
-    fn table() -> ColumnType;
+    fn table() -> ColumnsEnum;
 }
 
-pub trait RelationColumn<OtherColumnType, ColumnType>
-where
-    OtherColumnType: Iden,
-    ColumnType: Iden,
-{
-    fn get_relation_id_column() -> ColumnType;
+pub trait RelationColumn<OtherColumnsEnum, ColumnsEnum> {
+    fn get_relation_id_column() -> ColumnsEnum;
 }

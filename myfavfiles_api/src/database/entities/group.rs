@@ -2,15 +2,7 @@ use uuid::Uuid;
 
 use crate::database::loaders::Identifiable;
 
-#[allow(dead_code)]
-pub enum Columns {
-    Table,
-    Id,
-    Name,
-}
-
-impl_iden! {
-    Columns,
+columns! {
     Table => "group",
     Id => "id",
     Name => "name",
