@@ -13,12 +13,10 @@ pub struct Context {
 }
 
 impl Context {
-    pub async fn database_connection(&self) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, sqlx::Error> {
-        self.app_state
-            .clone()
-            .database_connection
-            .acquire()
-            .await
+    pub async fn database_connection(
+        &self,
+    ) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, sqlx::Error> {
+        self.app_state.clone().database_connection.acquire().await
     }
 }
 

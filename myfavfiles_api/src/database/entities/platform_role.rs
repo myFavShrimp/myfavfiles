@@ -1,7 +1,6 @@
 use uuid::Uuid;
 
-use crate::{database::loaders::Identifiable};
-
+use crate::database::loaders::Identifiable;
 
 columns! {
     Table => "user",
@@ -28,10 +27,7 @@ impl super::TableEntity for Entity {
     type ColumnsEnum = Columns;
 
     fn all_columns() -> Vec<Columns> {
-        vec![
-            Columns::Id,
-            Columns::Name,
-        ]
+        vec![Columns::Id, Columns::Name]
     }
 
     fn id_column() -> Columns {

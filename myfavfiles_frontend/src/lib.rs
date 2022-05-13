@@ -1,12 +1,6 @@
 use std::path::PathBuf;
 
-use axum::{
-    body::Body,
-    http::Request,
-    response::IntoResponse,
-    routing::get_service,
-    Router,
-};
+use axum::{body::Body, http::Request, response::IntoResponse, routing::get_service, Router};
 use myfavfiles_common as common;
 use tower::ServiceExt;
 use tower_http::services::{ServeDir, ServeFile};

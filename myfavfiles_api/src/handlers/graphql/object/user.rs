@@ -23,9 +23,11 @@ impl entities::user::Entity {
     async fn group_member(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
-        LoadableRelationOneToMany::<
-            entities::user::Columns,
-        >::load_many_related(&mut loaders.group_member, context, vec![self.id])
+        LoadableRelationOneToMany::<entities::user::Columns>::load_many_related(
+            &mut loaders.group_member,
+            context,
+            vec![self.id],
+        )
         .await
     }
 }

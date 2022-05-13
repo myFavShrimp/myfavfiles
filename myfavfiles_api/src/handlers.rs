@@ -1,11 +1,6 @@
 use std::sync::Arc;
 
-use axum::{
-    body::Body,
-    extract::Extension,
-    http::Request,
-    response::IntoResponse,
-};
+use axum::{body::Body, extract::Extension, http::Request, response::IntoResponse};
 use tokio::sync::Mutex;
 
 use crate::{database::loaders::Loaders, AppState};

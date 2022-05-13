@@ -2,8 +2,8 @@ use uuid::Uuid;
 
 pub mod group;
 pub mod group_member;
-pub mod user;
 pub mod platform_role;
+pub mod user;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]
