@@ -28,11 +28,13 @@ impl super::TableEntity for Entity {
         vec![Columns::Id, Columns::Name]
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
-    }
-
     fn table() -> Columns {
         Columns::Table
+    }
+}
+
+impl super::IdColumn for Entity {
+    fn id_column() -> Columns {
+        Columns::Id
     }
 }

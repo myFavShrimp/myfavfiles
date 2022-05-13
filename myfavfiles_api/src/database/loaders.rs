@@ -9,7 +9,7 @@ use crate::handlers::graphql::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 
-use super::entities::{IdEntity, RelationColumn, TableEntity};
+use super::entities::{IdColumn, IdEntity, RelationColumn, TableEntity};
 
 sea_query::sea_query_driver_postgres!();
 
@@ -29,8 +29,14 @@ pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
 #[async_trait::async_trait]
 pub trait Loader
 where
-    Self::LoadableEntity:
-        Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Identifiable + Sync + TableEntity,
+    Self::LoadableEntity: Clone
+        + for<'r> FromRow<'r, PgRow>
+        + Send
+        + Unpin
+        + Identifiable
+        + Sync
+        + TableEntity
+        + IdColumn,
     <Self::LoadableEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static,
     sea_query::Value: From<Uuid>,
 {

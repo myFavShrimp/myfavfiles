@@ -4,6 +4,7 @@ pub mod group;
 pub mod group_member;
 pub mod platform_role;
 pub mod user;
+pub mod user_role;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]
@@ -16,9 +17,11 @@ pub trait TableEntity {
 
     fn all_columns() -> Vec<Self::ColumnsEnum>;
 
-    fn id_column() -> Self::ColumnsEnum;
-
     fn table() -> Self::ColumnsEnum;
+}
+
+pub trait IdColumn: TableEntity {
+    fn id_column() -> Self::ColumnsEnum;
 }
 
 pub trait RelationColumn<OtherColumnsEnum> {
