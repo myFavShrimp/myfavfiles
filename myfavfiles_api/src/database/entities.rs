@@ -11,12 +11,14 @@ pub struct IdEntity {
     pub id: Uuid,
 }
 
-pub trait TableEntity<ColumnsEnum> {
-    fn all_columns() -> Vec<ColumnsEnum>;
+pub trait TableEntity {
+    type ColumnsEnum;
 
-    fn id_column() -> ColumnsEnum;
+    fn all_columns() -> Vec<Self::ColumnsEnum>;
 
-    fn table() -> ColumnsEnum;
+    fn id_column() -> Self::ColumnsEnum;
+
+    fn table() -> Self::ColumnsEnum;
 }
 
 pub trait RelationColumn<OtherColumnsEnum> {

@@ -25,7 +25,6 @@ impl entities::user::Entity {
 
         LoadableRelationOneToMany::<
             entities::group_member::Entity,
-            entities::group_member::Columns,
             entities::user::Columns,
         >::load_many_related(&mut loaders.group_member, context, vec![self.id])
         .await

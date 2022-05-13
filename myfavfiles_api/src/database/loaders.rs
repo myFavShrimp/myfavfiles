@@ -27,7 +27,7 @@ pub struct Loaders {
 pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
 
 #[async_trait::async_trait]
-pub trait Loader<LoadableEntity, ColumnsEnum>
+pub trait Loader<LoadableEntity>
 where
     LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
@@ -35,9 +35,9 @@ where
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<ColumnsEnum>,
+        + TableEntity,
+    <LoadableEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static,
     sea_query::Value: From<Uuid>,
-    ColumnsEnum: Iden + Send + 'static,
 {
     fn cache(&mut self) -> Cache<Uuid, LoadableEntity>;
 
@@ -119,8 +119,8 @@ pub trait Identifiable {
 }
 
 #[async_trait::async_trait]
-pub trait LoadableRelationOneToMany<LoadableEntity, ColumnsEnum, OtherColumnsEnum>:
-    Loader<LoadableEntity, ColumnsEnum>
+pub trait LoadableRelationOneToMany<LoadableEntity, OtherColumnsEnum>:
+    Loader<LoadableEntity>
 where
     LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
@@ -128,8 +128,9 @@ where
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<ColumnsEnum>,
-    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
+        + TableEntity,
+    <LoadableEntity as TableEntity>::ColumnsEnum:  Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
+    //ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherColumnsEnum: Iden + Send + 'static,
 {
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
@@ -154,7 +155,7 @@ where
         let (sql, values) = build_select_query(
             vec![id_column],
             table,
-            ColumnsEnum::relation_id_column(),
+            <LoadableEntity as TableEntity>::ColumnsEnum::relation_id_column(),
             Some(ids),
         );
         let relational_ids = Self::query_ids(ctx, sql, values).await;
@@ -165,7 +166,7 @@ where
 
 
 #[async_trait::async_trait]
-pub trait LoadableRelationManyToMany<LoadableEntity, ColumnsEnum, OtherLoadableEntity, OtherColumnsEnum>: Loader<LoadableEntity, ColumnsEnum>
+pub trait LoadableRelationManyToMany<LoadableEntity, ColumnsEnum, OtherLoadableEntity, OtherColumnsEnum>: Loader<LoadableEntity>
 where
     LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
@@ -173,15 +174,17 @@ where
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<ColumnsEnum>,
-    ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
+        + TableEntity,
+    <LoadableEntity as TableEntity>::ColumnsEnum:  Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
+    //ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherLoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
         + Send
         + Unpin
         + Identifiable
         + Sync
-        + TableEntity<OtherColumnsEnum>,
+        + TableEntity,
+    <OtherLoadableEntity as TableEntity>::ColumnsEnum:  Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherColumnsEnum: Iden + Send + 'static,
     {
     async fn load_many_related(&mut self, _ctx: &Context, _ids: Vec<Uuid>) -> Vec<Arc<LoadableEntity>> {

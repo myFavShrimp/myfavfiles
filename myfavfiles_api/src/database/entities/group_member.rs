@@ -25,7 +25,9 @@ impl Identifiable for Entity {
     }
 }
 
-impl super::TableEntity<Columns> for Entity {
+impl super::TableEntity for Entity {
+    type ColumnsEnum = Columns;
+
     fn all_columns() -> Vec<Columns> {
         vec![
             Columns::Id,
