@@ -9,7 +9,9 @@ pub struct GroupLoader {
 }
 
 #[async_trait::async_trait]
-impl Loader<entities::group::Entity> for GroupLoader {
+impl Loader for GroupLoader {
+    type LoadableEntity = entities::group::Entity;
+
     fn cache(&mut self) -> Cache<Uuid, entities::group::Entity> {
         self.cache.clone()
     }

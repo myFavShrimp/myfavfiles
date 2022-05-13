@@ -9,7 +9,9 @@ pub struct UserLoader {
 }
 
 #[async_trait::async_trait]
-impl Loader<entities::user::Entity> for UserLoader {
+impl Loader for UserLoader {
+    type LoadableEntity = entities::user::Entity;
+
     fn cache(&mut self) -> Cache<Uuid, entities::user::Entity> {
         self.cache.clone()
     }

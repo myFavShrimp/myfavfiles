@@ -9,9 +9,11 @@ pub struct GroupMemberLoader {
 }
 
 #[async_trait::async_trait]
-impl Loader<entities::group_member::Entity>
+impl Loader
     for GroupMemberLoader
 {
+    type LoadableEntity = entities::group_member::Entity;
+    
     fn cache(&mut self) -> Cache<Uuid, entities::group_member::Entity> {
         self.cache.clone()
     }
@@ -19,7 +21,6 @@ impl Loader<entities::group_member::Entity>
 
 impl
     LoadableRelationOneToMany<
-        entities::group_member::Entity,
         entities::user::Columns,
     > for GroupMemberLoader
 {
@@ -27,7 +28,6 @@ impl
 
 impl
     LoadableRelationOneToMany<
-        entities::group_member::Entity,
         entities::group::Columns,
     > for GroupMemberLoader
 {
