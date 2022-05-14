@@ -15,6 +15,7 @@ sea_query::sea_query_driver_postgres!();
 
 pub mod group;
 pub mod group_member;
+pub mod platform_role;
 pub mod user;
 
 #[derive(Default)]
@@ -22,6 +23,7 @@ pub struct Loaders {
     pub user: user::UserLoader,
     pub group: group::GroupLoader,
     pub group_member: group_member::GroupMemberLoader,
+    pub platform_role: platform_role::PlatformRoleLoader,
 }
 
 pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
@@ -135,8 +137,6 @@ pub trait Identifiable {
 #[async_trait::async_trait]
 pub trait LoadableRelationOneToMany<OtherColumnsEnum>: Loader
 where
-    <Self as Loader>::LoadableEntity:
-        Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Identifiable + Sync + TableEntity,
     <<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum:
         Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
     OtherColumnsEnum: Iden + Send + 'static,
@@ -176,19 +176,14 @@ where
 }
 
 #[async_trait::async_trait]
-pub trait LoadableRelationManyToMany<ColumnsEnum, OtherLoadableEntity, OtherColumnsEnum>:
-    Loader
+pub trait LoadableRelationManyToMany<OtherColumnsEnum>: Loader
 where
-    <Self as Loader>::LoadableEntity:
-        Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Identifiable + Sync + TableEntity,
-    <<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum:
-        Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
-    OtherLoadableEntity:
-        Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Identifiable + Sync + TableEntity,
-    <OtherLoadableEntity as TableEntity>::ColumnsEnum:
-        Iden + Send + 'static + RelationColumn<OtherColumnsEnum>,
+    <<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static,
     OtherColumnsEnum: Iden + Send + 'static,
+    Self::AssociationEntity: Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Sync + TableEntity,
 {
+    type AssociationEntity;
+
     async fn load_many_related(
         &mut self,
         _ctx: &Context,

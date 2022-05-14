@@ -36,4 +36,26 @@ impl Query {
 
         loaders.group.load_many(context, Some(vec![id])).await.pop()
     }
+
+    async fn platform_roles(
+        context: &Context,
+        ids: Option<Vec<Uuid>>,
+    ) -> Vec<Arc<entities::platform_role::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        loaders.platform_role.load_many(context, ids).await
+    }
+
+    async fn platform_role(
+        context: &Context,
+        id: Uuid,
+    ) -> Option<Arc<entities::platform_role::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        loaders
+            .platform_role
+            .load_many(context, Some(vec![id]))
+            .await
+            .pop()
+    }
 }

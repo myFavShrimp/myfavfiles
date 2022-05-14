@@ -29,6 +29,12 @@ impl super::TableEntity for Entity {
 
 impl super::RelationColumn<entities::user::Columns> for Columns {
     fn relation_id_column() -> Self {
-        todo!()
+        Columns::UserId
+    }
+}
+
+impl super::RelationColumn<entities::platform_role::Columns> for Columns {
+    fn relation_id_column() -> Self {
+        Columns::PlatformRoleId
     }
 }

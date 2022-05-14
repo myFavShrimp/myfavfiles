@@ -13,8 +13,6 @@ columns! {
 pub struct Entity {
     pub id: Uuid,
     pub name: String,
-    pub password: String,
-    pub is_admin: bool,
 }
 
 impl Identifiable for Entity {
