@@ -35,6 +35,12 @@ impl AssociationEntity<entities::platform_role::Columns> for Entity {
     }
 }
 
+impl AssociationEntity<entities::user::Columns> for Entity {
+    fn id(&self) -> Uuid {
+        self.user_id
+    }
+}
+
 impl super::RelationColumn<entities::user::Columns> for Columns {
     fn relation_id_column() -> Self {
         Columns::UserId

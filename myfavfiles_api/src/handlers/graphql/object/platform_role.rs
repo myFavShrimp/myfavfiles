@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::Loader};
+use crate::database::{entities, loaders::{Loader, LoadableRelationManyToMany}};
 
 #[graphql_object(Context = Context, name = "PlatformRole")]
 impl entities::platform_role::Entity {
@@ -16,12 +16,14 @@ impl entities::platform_role::Entity {
         &self.name
     }
 
-    // async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
-    //     let mut loaders = context.loaders.lock().await;
-    //
-    //     loaders
-    //         .user
-    //         .load_many(context, Some(vec![self.user_id]))
-    //         .await
-    // }
+    async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+    
+        LoadableRelationManyToMany::<entities::platform_role::Columns>::load_many_related(
+            &mut loaders.user,
+            context,
+            vec![self.id],
+        )
+        .await
+    }
 }

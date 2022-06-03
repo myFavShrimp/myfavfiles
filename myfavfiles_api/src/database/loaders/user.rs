@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use super::{Cache, Loader};
+use super::{Cache, Loader, LoadableRelationManyToMany};
 use crate::database::entities;
 
 #[derive(Default)]
@@ -14,5 +14,13 @@ impl Loader for UserLoader {
 
     fn cache(&mut self) -> Cache<Uuid, entities::user::Entity> {
         self.cache.clone()
+    }
+}
+
+impl LoadableRelationManyToMany<entities::platform_role::Columns> for UserLoader {
+    type AssociationEntity = entities::user_role::Entity;
+
+    fn associated_id(entity: Self::AssociationEntity) -> Uuid {
+        entity.platform_role_id
     }
 }
