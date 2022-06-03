@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, sync::Arc, fmt::Debug};
 
 use juniper::futures::lock::Mutex;
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
@@ -9,7 +9,7 @@ use crate::handlers::graphql::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 
-use super::entities::{IdColumn, IdEntity, RelationColumn, TableEntity};
+use super::entities::{IdColumn, IdEntity, RelationColumn, TableEntity, AssociationEntity};
 
 sea_query::sea_query_driver_postgres!();
 
@@ -180,15 +180,45 @@ pub trait LoadableRelationManyToMany<OtherColumnsEnum>: Loader
 where
     <<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static,
     OtherColumnsEnum: Iden + Send + 'static,
-    Self::AssociationEntity: Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Sync + TableEntity,
+    Self::AssociationEntity: Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Sync + TableEntity + AssociationEntity<<<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum> + Debug,
+    <Self::AssociationEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static + RelationColumn<OtherColumnsEnum> + RelationColumn<<<Self as Loader>::LoadableEntity as TableEntity>::ColumnsEnum> + Debug,
 {
     type AssociationEntity;
 
+    fn associated_id(entity: Self::AssociationEntity) -> Uuid;
+
+    async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
+        let mut conn = ctx.database_connection().await.unwrap();
+        let query = bind_query_as(sqlx::query_as::<_, Self::AssociationEntity>(&sql), &values);
+
+        if let Ok(rows) = query.fetch_all(&mut conn).await {
+            rows.iter().fold(Vec::new(), |mut acc, item| {
+                acc.push(item.id().clone());
+
+                acc
+            })
+        } else {
+            Vec::new()
+        }
+    }
+
     async fn load_many_related(
         &mut self,
-        _ctx: &Context,
-        _ids: Vec<Uuid>,
+        ctx: &Context,
+        ids: Vec<Uuid>,
     ) -> Vec<Arc<<Self as Loader>::LoadableEntity>> {
-        panic!("Not implemented!");
+        let id_column = <Self as Loader>::LoadableEntity::id_column();
+        let table = <Self as Loader>::LoadableEntity::table();
+
+        let (sql, values) = build_select_query(
+            <Self::AssociationEntity as TableEntity>::all_columns(),
+            <Self::AssociationEntity as TableEntity>::table(),
+            <<Self::AssociationEntity as TableEntity>::ColumnsEnum as RelationColumn<OtherColumnsEnum>>::relation_id_column(),
+            Some(ids),
+        );
+
+        let relational_ids = Self::query_ids(ctx, sql, values).await;
+
+        self.load_many(ctx, Some(relational_ids)).await
     }
 }

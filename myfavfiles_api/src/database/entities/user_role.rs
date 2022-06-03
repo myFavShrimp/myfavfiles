@@ -2,6 +2,8 @@ use uuid::Uuid;
 
 use crate::database::entities;
 
+use super::AssociationEntity;
+
 columns! {
     Table => "user_role",
     UserId => "user_id",
@@ -24,6 +26,12 @@ impl super::TableEntity for Entity {
 
     fn table() -> Columns {
         Columns::Table
+    }
+}
+
+impl AssociationEntity<entities::platform_role::Columns> for Entity {
+    fn id(&self) -> Uuid {
+        self.platform_role_id
     }
 }
 

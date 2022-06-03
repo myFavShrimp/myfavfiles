@@ -19,4 +19,8 @@ impl Loader for PlatformRoleLoader {
 
 impl LoadableRelationManyToMany<entities::user::Columns> for PlatformRoleLoader {
     type AssociationEntity = entities::user_role::Entity;
+
+    fn associated_id(entity: Self::AssociationEntity) -> Uuid {
+        entity.user_id
+    }
 }

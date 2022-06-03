@@ -2,6 +2,7 @@ macro_rules! columns {
     ($($x: ident => $y: literal,)+) => {
         use sea_query::Iden;
 
+        #[derive(Debug)]
         pub enum Columns {
             $($x,)+
         }

@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::database::loaders::Identifiable;
 
 columns! {
-    Table => "user",
+    Table => "platform_role",
     Id => "id",
     Name => "name",
 }
