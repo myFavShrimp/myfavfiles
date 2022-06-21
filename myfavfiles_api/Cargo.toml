@@ -43,7 +43,7 @@ features = [
 ]
 
 [dependencies.sea-query]
-version = "0.24.4"
+version = "0.25"
 features = [
     "sqlx-postgres",
     "with-chrono",

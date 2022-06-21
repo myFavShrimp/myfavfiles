@@ -34,7 +34,7 @@ impl entities::user::Entity {
         .await
     }
 
-    async fn platform_role(context: &Context) -> Vec<Arc<entities::platform_role::Entity>> {
+    async fn platform_roles(context: &Context) -> Vec<Arc<entities::platform_role::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         LoadableRelationManyToMany::<entities::user::Columns>::load_many_related(

@@ -38,7 +38,8 @@ where
         + Identifiable
         + Sync
         + TableEntity
-        + IdColumn,
+        + IdColumn
+        + Debug,
     <Self::LoadableEntity as TableEntity>::ColumnsEnum: Iden + Send + 'static,
     sea_query::Value: From<Uuid>,
 {
