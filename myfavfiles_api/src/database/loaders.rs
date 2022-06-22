@@ -15,8 +15,8 @@ sea_query::sea_query_driver_postgres!();
 
 pub mod group;
 pub mod group_member;
-pub mod platform_role;
 pub mod group_role;
+pub mod platform_role;
 pub mod user;
 
 #[derive(Default)]

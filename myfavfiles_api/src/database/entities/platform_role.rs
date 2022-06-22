@@ -44,10 +44,7 @@ impl super::IdColumn for Entity {
 }
 
 #[derive(Copy, Clone, Debug, sqlx::Type, GraphQLEnum)]
-#[sqlx(
-    type_name = "platform_permissions_enum", 
-    rename_all = "snake_case"
-)]
+#[sqlx(type_name = "platform_permissions_enum", rename_all = "snake_case")]
 
 pub enum PlatformRolePermission {
     CreateInviteCode,

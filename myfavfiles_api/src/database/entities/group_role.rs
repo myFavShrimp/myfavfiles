@@ -31,7 +31,12 @@ impl super::TableEntity for Entity {
     type ColumnsEnum = Columns;
 
     fn all_columns() -> Vec<Columns> {
-        vec![Columns::Id, Columns::Name, Columns::GroupId, Columns::Permissions]
+        vec![
+            Columns::Id,
+            Columns::Name,
+            Columns::GroupId,
+            Columns::Permissions,
+        ]
     }
 
     fn table() -> Columns {
@@ -46,10 +51,7 @@ impl super::IdColumn for Entity {
 }
 
 #[derive(Copy, Clone, Debug, sqlx::Type, GraphQLEnum)]
-#[sqlx(
-    type_name = "group_permissions_enum", 
-    rename_all = "snake_case"
-)]
+#[sqlx(type_name = "group_permissions_enum", rename_all = "snake_case")]
 
 pub enum GroupRolePermission {
     CreateInviteCode,
