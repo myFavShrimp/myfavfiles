@@ -149,7 +149,7 @@ where
         let query = bind_query_as(sqlx::query_as::<_, IdEntity>(&sql), &values);
         if let Ok(rows) = query.fetch_all(&mut conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
-                acc.push(item.id.clone());
+                acc.push(item.id);
 
                 acc
             })
@@ -208,7 +208,7 @@ where
 
         if let Ok(rows) = query.fetch_all(&mut conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
-                acc.push(item.id().clone());
+                acc.push(item.id());
 
                 acc
             })

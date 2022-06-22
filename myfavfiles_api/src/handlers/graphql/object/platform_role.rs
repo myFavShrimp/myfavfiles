@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::super::Context;
 use crate::database::{
     entities,
-    loaders::{LoadableRelationManyToMany, Loader},
+    loaders::LoadableRelationManyToMany,
 };
 
 #[graphql_object(Context = Context, name = "PlatformRole")]
