@@ -16,6 +16,10 @@ impl entities::platform_role::Entity {
         &self.name
     }
 
+    async fn permissions(&self) -> Vec<entities::platform_role::PlatformRolePermission> {
+        self.permissions.clone()
+    }
+
     async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
     
@@ -25,9 +29,5 @@ impl entities::platform_role::Entity {
             vec![self.id],
         )
         .await
-    }
-
-    async fn permissions(&self) -> Vec<entities::platform_role::Permission> {
-        self.permissions.clone()
     }
 }

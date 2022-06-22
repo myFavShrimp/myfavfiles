@@ -58,4 +58,13 @@ impl Query {
             .await
             .pop()
     }
+
+    async fn group_roles(
+        context: &Context,
+        ids: Option<Vec<Uuid>>,
+    ) -> Vec<Arc<entities::group_role::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        loaders.group_role.load_many(context, ids).await
+    }
 }

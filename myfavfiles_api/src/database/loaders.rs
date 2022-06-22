@@ -16,6 +16,7 @@ sea_query::sea_query_driver_postgres!();
 pub mod group;
 pub mod group_member;
 pub mod platform_role;
+pub mod group_role;
 pub mod user;
 
 #[derive(Default)]
@@ -24,6 +25,7 @@ pub struct Loaders {
     pub group: group::GroupLoader,
     pub group_member: group_member::GroupMemberLoader,
     pub platform_role: platform_role::PlatformRoleLoader,
+    pub group_role: group_role::GroupRoleLoader,
 }
 
 pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
