@@ -3,6 +3,7 @@ use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
 use crate::database::loaders::Identifiable;
+use crate::database::entities;
 
 columns! {
     Table => "group_role",
@@ -65,5 +66,11 @@ pub enum GroupRolePermission {
 impl PgHasArrayType for GroupRolePermission {
     fn array_type_info() -> sqlx::postgres::PgTypeInfo {
         sqlx::postgres::PgTypeInfo::with_name("_group_permissions_enum")
+    }
+}
+
+impl super::RelationColumn<entities::group::Columns> for Columns {
+    fn relation_id_column() -> Columns {
+        Columns::GroupId
     }
 }

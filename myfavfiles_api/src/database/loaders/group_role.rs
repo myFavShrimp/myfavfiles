@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use super::{Cache, LoadableRelationManyToMany, Loader};
+use super::{Cache, LoadableRelationOneToMany, Loader};
 use crate::database::entities;
 
 #[derive(Default)]
@@ -17,10 +17,4 @@ impl Loader for GroupRoleLoader {
     }
 }
 
-// impl LoadableRelationManyToMany<entities::user::Columns> for PlatformRoleLoader {
-//     type AssociationEntity = entities::user_role::Entity;
-//
-//     fn associated_id(entity: Self::AssociationEntity) -> Uuid {
-//         entity.user_id
-//     }
-// }
+impl LoadableRelationOneToMany<entities::group::Columns> for GroupRoleLoader {}
