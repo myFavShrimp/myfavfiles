@@ -7,6 +7,7 @@ pub mod group_role;
 pub mod platform_role;
 pub mod user;
 pub mod user_role;
+pub mod group_member_role;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]

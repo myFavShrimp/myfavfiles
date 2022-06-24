@@ -16,27 +16,27 @@ $$
 $$;
 
 CREATE TRIGGER permission_changes
-  BEFORE UPDATE
-  ON platform_role
-  FOR EACH ROW
-  EXECUTE PROCEDURE uniquify_permissions_array_on_change();
+BEFORE UPDATE
+ON platform_role
+FOR EACH ROW
+EXECUTE PROCEDURE uniquify_permissions_array_on_change();
  
 CREATE TRIGGER permission_insert
-  BEFORE INSERT
-  ON platform_role
-  FOR EACH ROW
-  EXECUTE PROCEDURE uniquify_permissions_array_on_change();
+BEFORE INSERT
+ON platform_role
+FOR EACH ROW
+EXECUTE PROCEDURE uniquify_permissions_array_on_change();
  
  
 CREATE TRIGGER permission_changes
-  BEFORE UPDATE
-  ON group_role
-  FOR EACH ROW
-  EXECUTE PROCEDURE uniquify_permissions_array_on_change();
+BEFORE UPDATE
+ON group_role
+FOR EACH ROW
+EXECUTE PROCEDURE uniquify_permissions_array_on_change();
  
 CREATE TRIGGER permission_insert
-  BEFORE INSERT
-  ON group_role
-  FOR EACH ROW
-  EXECUTE PROCEDURE uniquify_permissions_array_on_change();
+BEFORE INSERT
+ON group_role
+FOR EACH ROW
+EXECUTE PROCEDURE uniquify_permissions_array_on_change();
  

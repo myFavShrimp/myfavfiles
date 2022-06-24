@@ -26,4 +26,15 @@ impl entities::group_role::Entity {
     async fn permissions(&self) -> Vec<entities::group_role::GroupRolePermission> {
         self.permissions.clone()
     }
+
+    async fn group_members(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        LoadableRelationManyToMany::<entities::group_role::Columns>::load_many_related(
+            &mut loaders.group_member,
+            context,
+            vec![self.id],
+        )
+        .await
+    }
 }
