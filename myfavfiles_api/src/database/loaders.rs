@@ -18,6 +18,8 @@ pub mod group_member;
 pub mod group_role;
 pub mod platform_role;
 pub mod user;
+pub mod group_file_share;
+pub mod user_file_share;
 
 #[derive(Default)]
 pub struct Loaders {
@@ -26,6 +28,8 @@ pub struct Loaders {
     pub group_member: group_member::GroupMemberLoader,
     pub platform_role: platform_role::PlatformRoleLoader,
     pub group_role: group_role::GroupRoleLoader,
+    pub group_file_share: group_file_share::GroupFileShare,
+    pub user_file_share: user_file_share::UserFileShare,
 }
 
 pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;

@@ -1,0 +1,12 @@
+- user
+- group
+- group_member
+- group_role
+- group_member_role
+- platform_role
+- user_role
+-  invite_code
+  user_file_share
+  group_file_share
+
+  unique constraints on pure association tables

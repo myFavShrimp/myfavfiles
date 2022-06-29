@@ -44,4 +44,26 @@ impl entities::user::Entity {
         )
         .await
     }
+
+    async fn group_file_shares(context: &Context) -> Vec<Arc<entities::group_file_share::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        LoadableRelationOneToMany::<entities::user::Columns>::load_many_related(
+            &mut loaders.group_file_share,
+            context,
+            vec![self.id],
+        )
+        .await
+    }
+
+    async fn file_shares(context: &Context) -> Vec<Arc<entities::user_file_share::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        LoadableRelationOneToMany::<entities::user::Columns>::load_many_related(
+            &mut loaders.user_file_share,
+            context,
+            vec![self.id],
+        )
+        .await
+    }
 }

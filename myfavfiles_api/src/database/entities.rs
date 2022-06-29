@@ -8,6 +8,8 @@ pub mod platform_role;
 pub mod user;
 pub mod user_role;
 pub mod group_member_role;
+pub mod group_file_share;
+pub mod user_file_share;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]
