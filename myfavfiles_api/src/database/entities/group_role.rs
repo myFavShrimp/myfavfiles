@@ -2,8 +2,8 @@ use juniper::GraphQLEnum;
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
-use crate::database::loaders::Identifiable;
 use crate::database::entities;
+use crate::database::loaders::Identifiable;
 
 columns! {
     Table => "group_role",

@@ -4,10 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{
-    entities,
-    loaders::LoadableRelationManyToMany,
-};
+use crate::database::{entities, loaders::LoadableRelationManyToMany};
 
 #[graphql_object(Context = Context, name = "PlatformRole")]
 impl entities::platform_role::Entity {

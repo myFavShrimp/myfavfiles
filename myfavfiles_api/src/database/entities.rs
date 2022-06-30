@@ -2,14 +2,14 @@ use sea_query::Iden;
 use uuid::Uuid;
 
 pub mod group;
+pub mod group_file_share;
 pub mod group_member;
+pub mod group_member_role;
 pub mod group_role;
 pub mod platform_role;
 pub mod user;
-pub mod user_role;
-pub mod group_member_role;
-pub mod group_file_share;
 pub mod user_file_share;
+pub mod user_role;
 
 #[derive(sqlx::FromRow, Debug, Clone)]
 #[allow(dead_code)]

@@ -28,11 +28,7 @@ impl super::TableEntity for Entity {
     type ColumnsEnum = Columns;
 
     fn all_columns() -> Vec<Columns> {
-        vec![
-            Columns::Id,
-            Columns::UserId,
-            Columns::Expiration,
-        ]
+        vec![Columns::Id, Columns::UserId, Columns::Expiration]
     }
 
     fn table() -> Columns {
