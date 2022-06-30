@@ -5,7 +5,7 @@ use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
 use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
-use crate::handlers::graphql::Context;
+use crate::handlers::graphql::authenticated::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 

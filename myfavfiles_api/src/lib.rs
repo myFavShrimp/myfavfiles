@@ -10,14 +10,14 @@ pub mod handlers;
 
 pub struct State {
     database_connection: database::DbPool,
-    graphql_root: handlers::graphql::Root,
+    graphql_root_authenticated: handlers::graphql::authenticated::Root,
 }
 
 impl State {
     async fn new() -> Self {
         Self {
             database_connection: database::connection_pool().await,
-            graphql_root: handlers::graphql::create_root(),
+            graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
         }
     }
 }

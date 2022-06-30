@@ -11,12 +11,12 @@ pub async fn graphql(
     Extension(ref state): Extension<AppState>,
     req: Request<Body>,
 ) -> impl IntoResponse {
-    let context = std::sync::Arc::new(graphql::Context {
+    let context = std::sync::Arc::new(graphql::authenticated::Context {
         app_state: state.clone(),
         loaders: Arc::new(Mutex::new(Loaders::default())),
     });
 
-    juniper_hyper::graphql(state.graphql_root.clone(), context, req).await
+    juniper_hyper::graphql(state.graphql_root_authenticated.clone(), context, req).await
 }
 
 pub async fn playground() -> impl IntoResponse {
