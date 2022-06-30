@@ -23,7 +23,7 @@ impl entities::group_role::Entity {
         self.group_id
     }
 
-    async fn permissions(&self) -> Vec<entities::group_role::GroupRolePermission> {
+    async fn permissions(&self) -> Option<Vec<entities::group_role::GroupRolePermission>> {
         self.permissions.clone()
     }
 
@@ -38,12 +38,14 @@ impl entities::group_role::Entity {
         .await
     }
 
-    async fn group(context: &Context) -> Vec<Arc<entities::group::Entity>> {
+    async fn group(context: &Context) -> Arc<entities::group::Entity> {
         let mut loaders = context.loaders.lock().await;
 
         loaders
             .group
             .load_many(context, Some(vec![self.group_id]))
             .await
+            .pop()
+            .unwrap()
     }
 }

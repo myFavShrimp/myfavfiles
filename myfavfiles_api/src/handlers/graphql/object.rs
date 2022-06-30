@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 pub mod group;
 pub mod group_member;
 pub mod group_role;

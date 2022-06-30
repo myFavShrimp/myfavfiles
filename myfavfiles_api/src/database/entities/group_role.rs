@@ -19,7 +19,7 @@ pub struct Entity {
     pub id: Uuid,
     pub name: String,
     pub group_id: Uuid,
-    pub permissions: Vec<GroupRolePermission>,
+    pub permissions: Option<Vec<GroupRolePermission>>,
 }
 
 impl Identifiable for Entity {

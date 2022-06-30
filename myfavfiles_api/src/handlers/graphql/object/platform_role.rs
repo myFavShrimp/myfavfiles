@@ -23,7 +23,7 @@ impl entities::platform_role::Entity {
         self.permissions.clone()
     }
 
-    async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+    async fn users(context: &Context) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         LoadableRelationManyToMany::<entities::platform_role::Columns>::load_many_related(

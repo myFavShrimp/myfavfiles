@@ -23,7 +23,7 @@ impl entities::user::Entity {
         self.is_admin
     }
 
-    async fn group_member(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
+    async fn groups(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         LoadableRelationOneToMany::<entities::user::Columns>::load_many_related(

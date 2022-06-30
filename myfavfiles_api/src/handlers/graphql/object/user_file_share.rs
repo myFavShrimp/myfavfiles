@@ -21,12 +21,14 @@ impl entities::user_file_share::Entity {
         self.expiration
     }
 
-    async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+    async fn user(context: &Context) -> Arc<entities::user::Entity> {
         let mut loaders = context.loaders.lock().await;
 
         loaders
             .user
             .load_many(context, Some(vec![self.user_id]))
             .await
+            .pop()
+            .unwrap()
     }
 }

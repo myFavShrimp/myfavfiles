@@ -24,22 +24,24 @@ impl entities::group_member::Entity {
         self.is_admin
     }
 
-    async fn group(context: &Context) -> Vec<Arc<entities::group::Entity>> {
+    async fn group(context: &Context) -> Option<Arc<entities::group::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         loaders
             .group
             .load_many(context, Some(vec![self.group_id]))
             .await
+            .pop()
     }
 
-    async fn user(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+    async fn user(context: &Context) -> Option<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
 
         loaders
             .user
             .load_many(context, Some(vec![self.user_id]))
             .await
+            .pop()
     }
 
     async fn group_roles(context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
