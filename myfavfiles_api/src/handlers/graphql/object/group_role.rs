@@ -6,7 +6,7 @@ use uuid::Uuid;
 use super::super::Context;
 use crate::database::{
     entities,
-    loaders::LoadableRelationManyToMany,
+    loaders::{LoadableRelationManyToMany, Loader},
 };
 
 #[graphql_object(Context = Context, name = "GroupRole")]
@@ -36,5 +36,14 @@ impl entities::group_role::Entity {
             vec![self.id],
         )
         .await
+    }
+
+    async fn group(context: &Context) -> Vec<Arc<entities::group::Entity>> {
+        let mut loaders = context.loaders.lock().await;
+
+        loaders
+            .group
+            .load_many(context, Some(vec![self.group_id]))
+            .await
     }
 }

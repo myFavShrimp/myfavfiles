@@ -5,7 +5,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::{Loader, LoadableRelationManyToMany}};
+use crate::database::{entities, loaders::Loader};
 
 #[graphql_object(Context = Context, name = "GroupFileShare")]
 impl entities::group_file_share::Entity {
