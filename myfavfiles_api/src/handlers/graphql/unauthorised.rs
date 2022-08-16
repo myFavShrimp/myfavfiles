@@ -1,9 +1,10 @@
-use crate::AppState;
+use crate::{AppState, database::DbPool};
 
 pub mod query;
 
 pub struct Context {
     pub app_state: AppState,
+    pub database_connection_pool: DbPool,
 }
 
 impl juniper::Context for Context {}
