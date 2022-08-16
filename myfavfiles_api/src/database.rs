@@ -1,7 +1,5 @@
 use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
-use myfavfiles_common::config::Config;
-
 #[macro_use]
 mod macros;
 pub mod entities;
@@ -14,31 +12,30 @@ pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the da
 pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database migrations.";
 pub const DATABASE_CREATION_ERROR_MESSAGE: &str = "Could not create the database.";
 
-pub async fn connection_pool() -> DbPool {
-    PgPool::connect(&Config::default().database_url)
+pub async fn connection_pool(database_url: &str) -> DbPool {
+    PgPool::connect(database_url)
         .await
         .expect(DATABASE_CONNECTION_ERROR_MESSAGE)
 }
 
-pub async fn initialize_database() {
-    create_database_if_not_exists().await;
-    apply_migrations().await;
+pub async fn initialize_database(database_url: &str) {
+    create_database_if_not_exists(database_url).await;
+    apply_migrations(database_url).await;
 }
 
-async fn create_database_if_not_exists() {
-    let database_url = &Config::default().database_url;
-    if !sqlx::Postgres::database_exists(database_url)
+async fn create_database_if_not_exists(database_url: &str) {
+    if !sqlx::Postgres::database_exists(&database_url)
         .await
         .expect(DATABASE_CREATION_ERROR_MESSAGE)
     {
-        sqlx::Postgres::create_database(database_url)
+        sqlx::Postgres::create_database(&database_url)
             .await
             .expect(DATABASE_CREATION_ERROR_MESSAGE);
     }
 }
 
-async fn apply_migrations() {
-    let pool = connection_pool().await;
+async fn apply_migrations(database_url: &str) {
+    let pool = connection_pool(database_url).await;
     sqlx::migrate!("../migrations")
         .run(&pool)
         .await

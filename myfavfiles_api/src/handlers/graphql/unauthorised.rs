@@ -6,14 +6,6 @@ pub struct Context {
     pub app_state: AppState,
 }
 
-impl Context {
-    pub async fn database_connection(
-        &self,
-    ) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, sqlx::Error> {
-        self.app_state.clone().database_connection.acquire().await
-    }
-}
-
 impl juniper::Context for Context {}
 
 pub type Root = std::sync::Arc<

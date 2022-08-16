@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
+use myfavfiles_common::config::Config;
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Loader};
+use crate::{database::entities, database::loaders::Loader, auth::token::Token};
 
 use super::Context;
 
@@ -10,6 +11,16 @@ pub struct Query;
 
 #[juniper::graphql_object(context = Context)]
 impl Query {
+    pub fn me() -> String {
+        let token = Token {
+            sub: Uuid::parse_str("cb8c8187-ecd7-4000-8066-cdc3f8449b35").unwrap(),
+            jti: Uuid::parse_str("cb8c8187-ecd7-4000-8066-cdc3f8449b35").unwrap(),
+            exp: 1657577027,
+        };
+
+        token.encode(&Config::default().jwt_secret).unwrap()
+    }
+
     async fn users(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::user::Entity>> {
         let mut loaders = context.loaders.lock().await;
 

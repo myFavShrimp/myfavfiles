@@ -2,33 +2,37 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
+use myfavfiles_common::config::Config;
+use tower::ServiceBuilder;
 use std::sync::Arc;
 
 #[macro_use]
 pub mod database;
 pub mod handlers;
+pub mod auth;
 
 pub struct State {
-    database_connection: database::DbPool,
+    config: Config,
     graphql_root_authenticated: handlers::graphql::authenticated::Root,
-}
-
-impl State {
-    async fn new() -> Self {
-        Self {
-            database_connection: database::connection_pool().await,
-            graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
-        }
-    }
+    graphql_root_unauthorised: handlers::graphql::unauthorised::Root,
 }
 
 type AppState = Arc<State>;
 
-pub async fn create_api_router() -> Router {
-    let app_state: AppState = Arc::new(State::new().await);
+pub async fn create_api_router(config: Config) -> Router {
+    let state = State {
+        config: config,
+        graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
+        graphql_root_unauthorised: handlers::graphql::unauthorised::create_root(),
+    };
+
+    let app_state: AppState = Arc::new(state);
 
     Router::new()
         .route("/graphql", post(handlers::graphql))
         .route("/playground", get(handlers::playground))
-        .layer(Extension(app_state))
+        .layer(
+            ServiceBuilder::new()
+                .layer(Extension(app_state))
+        )
 }

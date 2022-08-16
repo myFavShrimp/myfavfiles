@@ -4,10 +4,11 @@ use myfavfiles_frontend as frontend;
 
 #[tokio::main]
 async fn main() {
-    api::database::initialize_database().await;
+    let config = common::config::Config::default();
+    api::database::initialize_database(&config.database_url).await;
 
     let address = common::config::Config::default().address();
-    let api_router = api::create_api_router().await;
+    let api_router = api::create_api_router(config).await;
     let app_router = axum::Router::new()
         .nest("/api", api_router)
         .fallback(axum::routing::get(frontend::fallback_frontend_handler));

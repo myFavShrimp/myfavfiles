@@ -4,10 +4,10 @@ use myfavfiles_common as common;
 
 #[tokio::main]
 async fn main() {
-    api::database::initialize_database().await;
+    let config = common::config::Config::default();
+    api::database::initialize_database(&config.database_url).await;
 
-    let app = api::create_api_router()
-        .await
+    let app = api::create_api_router(config).await
         .fallback(common::handler::handler_404.into_service());
     let address = common::config::Config::default().address();
 

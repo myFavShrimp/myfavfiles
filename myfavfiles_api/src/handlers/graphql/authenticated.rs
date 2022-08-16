@@ -2,13 +2,14 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use crate::{database::loaders::Loaders, AppState};
+use crate::{database::{loaders::Loaders, DbPool}, AppState};
 
 mod object;
 pub mod query;
 
 pub struct Context {
     pub app_state: AppState,
+    pub database_connection_pool: DbPool,
     pub loaders: Arc<Mutex<Loaders>>,
 }
 
@@ -16,7 +17,7 @@ impl Context {
     pub async fn database_connection(
         &self,
     ) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, sqlx::Error> {
-        self.app_state.clone().database_connection.acquire().await
+        self.database_connection_pool.acquire().await
     }
 }
 
