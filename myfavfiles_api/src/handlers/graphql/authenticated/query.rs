@@ -3,7 +3,7 @@ use std::sync::Arc;
 use myfavfiles_common::config::Config;
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Loader, auth::token::Token};
+use crate::{auth::token::Token, database::entities, database::loaders::Loader};
 
 use super::Context;
 

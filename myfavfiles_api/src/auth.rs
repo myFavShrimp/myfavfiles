@@ -3,8 +3,10 @@ use self::token::Token;
 use std::convert::Infallible;
 
 use async_trait::async_trait;
-use axum::{extract::{RequestParts, FromRequest}, http};
-
+use axum::{
+    extract::{FromRequest, RequestParts},
+    http,
+};
 
 pub mod token;
 
@@ -15,7 +17,6 @@ pub enum AuthStatus {
     Ok(Token),
 }
 
-
 #[async_trait]
 impl<B> FromRequest<B> for AuthStatus
 where
@@ -24,7 +25,8 @@ where
     type Rejection = Infallible;
 
     async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
-        let token_maybe = req.headers()
+        let token_maybe = req
+            .headers()
             .get(http::header::AUTHORIZATION)
             .and_then(|val| val.to_str().ok());
 

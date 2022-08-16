@@ -1,8 +1,8 @@
-use axum::{response::IntoResponse};
+use axum::response::IntoResponse;
 use hyper::StatusCode;
-use jsonwebtoken::{encode, Header, EncodingKey, decode, DecodingKey, Validation};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use myfavfiles_common::config::Config;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -14,12 +14,23 @@ pub struct Token {
 
 impl Token {
     pub fn encode(&self, secret: &str) -> Result<String, jsonwebtoken::errors::Error> {
-        encode(&Header::default(), self, &EncodingKey::from_secret(secret.as_bytes()))
+        encode(
+            &Header::default(),
+            self,
+            &EncodingKey::from_secret(secret.as_bytes()),
+        )
     }
 
-    pub fn from_encoded(encoded_token: &str, secret: &str) -> Result<Self, jsonwebtoken::errors::Error> {
-        decode::<Self>(encoded_token, &DecodingKey::from_secret(secret.as_bytes()), &Validation::new(Header::default().alg))
-            .map(|tok| tok.claims)
+    pub fn from_encoded(
+        encoded_token: &str,
+        secret: &str,
+    ) -> Result<Self, jsonwebtoken::errors::Error> {
+        decode::<Self>(
+            encoded_token,
+            &DecodingKey::from_secret(secret.as_bytes()),
+            &Validation::new(Header::default().alg),
+        )
+        .map(|tok| tok.claims)
     }
 }
 
@@ -33,6 +44,10 @@ impl TryFrom<&str> for Token {
 
 impl IntoResponse for Token {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::OK, self.encode(&Config::default().jwt_secret).unwrap()).into_response()
+        (
+            StatusCode::OK,
+            self.encode(&Config::default().jwt_secret).unwrap(),
+        )
+            .into_response()
     }
 }

@@ -2,7 +2,10 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use crate::{database::{loaders::Loaders, DbPool}, AppState};
+use crate::{
+    database::{loaders::Loaders, DbPool},
+    AppState,
+};
 
 mod object;
 pub mod query;

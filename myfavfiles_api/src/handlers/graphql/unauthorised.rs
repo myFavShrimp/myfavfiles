@@ -1,4 +1,4 @@
-use crate::{AppState, database::DbPool};
+use crate::{database::DbPool, AppState};
 
 pub mod query;
 

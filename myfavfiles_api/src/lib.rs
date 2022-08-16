@@ -3,13 +3,13 @@ use axum::{
     Extension, Router,
 };
 use myfavfiles_common::config::Config;
-use tower::ServiceBuilder;
 use std::sync::Arc;
+use tower::ServiceBuilder;
 
 #[macro_use]
 pub mod database;
-pub mod handlers;
 pub mod auth;
+pub mod handlers;
 
 pub struct State {
     config: Config,
@@ -31,8 +31,5 @@ pub async fn create_api_router(config: Config) -> Router {
     Router::new()
         .route("/graphql", post(handlers::graphql))
         .route("/playground", get(handlers::playground))
-        .layer(
-            ServiceBuilder::new()
-                .layer(Extension(app_state))
-        )
+        .layer(ServiceBuilder::new().layer(Extension(app_state)))
 }
