@@ -24,11 +24,11 @@ pub async fn initialize_database(database_url: &str) {
 }
 
 async fn create_database_if_not_exists(database_url: &str) {
-    if !sqlx::Postgres::database_exists(&database_url)
+    if !sqlx::Postgres::database_exists(database_url)
         .await
         .expect(DATABASE_CREATION_ERROR_MESSAGE)
     {
-        sqlx::Postgres::create_database(&database_url)
+        sqlx::Postgres::create_database(database_url)
             .await
             .expect(DATABASE_CREATION_ERROR_MESSAGE);
     }

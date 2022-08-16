@@ -31,7 +31,7 @@ where
         dbg!(&token_maybe);
         if let Some(token_str) = token_maybe {
             Token::try_from(token_str)
-                .and_then(|token| Ok(Self::Ok(token)))
+                .map(Self::Ok)
                 .or(Ok(Self::Invalid))
         } else {
             Ok(Self::Missing)

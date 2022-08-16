@@ -6,7 +6,6 @@ use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
 use crate::handlers::graphql::authenticated::Context;
-use crate::database;
 
 use self::sea_query_driver_postgres::bind_query_as;
 

@@ -19,7 +19,7 @@ impl Token {
 
     pub fn from_encoded(encoded_token: &str, secret: &str) -> Result<Self, jsonwebtoken::errors::Error> {
         decode::<Self>(encoded_token, &DecodingKey::from_secret(secret.as_bytes()), &Validation::new(Header::default().alg))
-            .and_then(|tok| Ok(tok.claims))
+            .map(|tok| tok.claims)
     }
 }
 
@@ -27,12 +27,12 @@ impl TryFrom<&str> for Token {
     type Error = jsonwebtoken::errors::Error;
 
     fn try_from(encoded: &str) -> Result<Self, Self::Error> {
-        Token::from_encoded(&encoded, &Config::default().jwt_secret)
+        Token::from_encoded(encoded, &Config::default().jwt_secret)
     }
 }
 
 impl IntoResponse for Token {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::OK, self.encode(&Config::default().jwt_secret).unwrap().to_string()).into_response()
+        (StatusCode::OK, self.encode(&Config::default().jwt_secret).unwrap()).into_response()
     }
 }
