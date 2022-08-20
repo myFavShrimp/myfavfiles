@@ -21,7 +21,7 @@ type AppState = Arc<State>;
 
 pub async fn create_api_router(config: Config) -> Router {
     let state = State {
-        config: config,
+        config,
         graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
         graphql_root_unauthorised: handlers::graphql::unauthorised::create_root(),
     };

@@ -17,11 +17,11 @@ where
     async fn all_cached(&mut self) -> Vec<Uuid> {
         self.cache().lock().await
             .keys()
-            .into_iter().map(|id| id.clone())
+            .into_iter().cloned()
             .collect()
     }
 
-    async fn get_all(&mut self, ids: &Vec<Uuid>) -> Vec<Arc<E>> {
+    async fn get_all(&mut self, ids: &[Uuid]) -> Vec<Arc<E>> {
         let _cache = self.cache();
         let cache = _cache.lock().await;
         ids.iter().fold(Vec::new(), |mut acc, id| {
