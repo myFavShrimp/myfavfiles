@@ -1,4 +1,4 @@
-# myfavfiles
+# 📂 myfavfiles
 
 ``` bash
 podman-compose -f resources/dev/docker-compose.yml up -d

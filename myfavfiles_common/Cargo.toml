@@ -6,10 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-envy = "0.4.2"
 axum = "0.5.0"
 dotenv = "0.15.0"
+serde-env = "0.0.3"
 
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
+
+[dependencies.uuid]
+ version = "0"
+ features = ["serde"]
+ 

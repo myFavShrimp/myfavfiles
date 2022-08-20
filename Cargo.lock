@@ -23,6 +23,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.62"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1485d4d2cc45e7b201ee3767015c96faa5904387c9d87c6efdd0fb511f12d305"
+
+[[package]]
 name = "ascii"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -940,8 +946,9 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "dotenv",
- "envy",
  "serde",
+ "serde-env",
+ "uuid",
 ]
 
 [[package]]
@@ -1389,6 +1396,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61ea8d54c77f8315140a05f4c7237403bf38b72704d031543aa1d16abbf517d1"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-env"
+version = "0.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e3db12214f282126b26c31a959a880721f669a5133de8041541d8060ea30a20"
+dependencies = [
+ "anyhow",
+ "log",
+ "serde",
 ]
 
 [[package]]

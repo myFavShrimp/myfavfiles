@@ -7,6 +7,7 @@ use axum::{
     extract::{FromRequest, RequestParts},
     http,
 };
+use myfavfiles_common::config::Config;
 
 pub mod token;
 
@@ -25,6 +26,14 @@ where
     type Rejection = Infallible;
 
     async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        if let Some(id) = Config::default().force_session {
+            return Ok(Self::Ok(Token {
+                sub: id,
+                jti: id,
+                exp: 0,
+            }));
+        }
+
         let token_maybe = req
             .headers()
             .get(http::header::AUTHORIZATION)

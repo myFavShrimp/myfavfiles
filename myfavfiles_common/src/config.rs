@@ -1,5 +1,7 @@
 use serde::Deserialize;
+use serde_env::from_env;
 use std::net::SocketAddr;
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -8,6 +10,7 @@ pub struct Config {
     pub database_url: String,
     pub frontend_path: String,
     pub jwt_secret: String,
+    pub force_session: Option<Uuid>,
 }
 
 impl Config {
@@ -21,6 +24,6 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         dotenv::dotenv().ok();
-        envy::from_env::<Config>().expect("load config")
+        from_env::<Config>().expect("load config")
     }
 }
