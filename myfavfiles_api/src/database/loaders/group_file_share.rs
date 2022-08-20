@@ -1,20 +1,20 @@
-use uuid::Uuid;
-
-use super::{Cache, LoadableRelationOneToMany, Loader};
-use crate::database::entities;
+use super::{LoadableRelationOneToMany, Loader};
+use crate::database::{entities, cache::{HasCache, Cache}};
 
 #[derive(Default)]
 pub struct GroupFileShare {
-    pub cache: Cache<Uuid, entities::group_file_share::Entity>,
+    pub cache: Cache<entities::group_file_share::Entity>,
+}
+
+impl HasCache<entities::group_file_share::Entity> for GroupFileShare {
+    fn cache(&mut self) -> Cache<entities::group_file_share::Entity> {
+        self.cache.clone()
+    }
 }
 
 #[async_trait::async_trait]
 impl Loader for GroupFileShare {
     type LoadableEntity = entities::group_file_share::Entity;
-
-    fn cache(&mut self) -> Cache<Uuid, entities::group_file_share::Entity> {
-        self.cache.clone()
-    }
 }
 
 impl LoadableRelationOneToMany<entities::user::Columns> for GroupFileShare {}

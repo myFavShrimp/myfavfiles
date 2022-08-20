@@ -4,6 +4,7 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 mod macros;
 pub mod entities;
 pub mod loaders;
+pub mod cache;
 
 pub type DbPool = Pool<Postgres>;
 pub type PoolConnection = sqlx::pool::PoolConnection<Postgres>;

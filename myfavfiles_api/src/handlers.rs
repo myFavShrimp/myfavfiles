@@ -16,8 +16,8 @@ pub async fn graphql(
     auth_status: AuthStatus,
     req: Request<Body>,
 ) -> impl IntoResponse {
-    match auth_status {
-        AuthStatus::Ok(_auth_token) => {
+    //match auth_status {
+        //AuthStatus::Ok(_auth_token) => {
             let context = Arc::new(graphql::authenticated::Context {
                 app_state: state.clone(),
                 database_connection_pool: database::connection_pool(&state.config.database_url)
@@ -26,17 +26,17 @@ pub async fn graphql(
             });
 
             juniper_hyper::graphql(state.graphql_root_authenticated.clone(), context, req).await
-        }
-        _unauthorised => {
-            let context = Arc::new(graphql::unauthorised::Context {
-                app_state: state.clone(),
-                database_connection_pool: database::connection_pool(&state.config.database_url)
-                    .await,
-            });
-
-            juniper_hyper::graphql(state.graphql_root_unauthorised.clone(), context, req).await
-        }
-    }
+        //}
+        //_unauthorised => {
+        //    let context = Arc::new(graphql::unauthorised::Context {
+        //        app_state: state.clone(),
+        //        database_connection_pool: database::connection_pool(&state.config.database_url)
+        //            .await,
+        //    });
+//
+        //    juniper_hyper::graphql(state.graphql_root_unauthorised.clone(), context, req).await
+        //}
+    //}
 }
 
 pub async fn playground() -> impl IntoResponse {

@@ -1,20 +1,23 @@
 use uuid::Uuid;
 
-use super::{Cache, LoadableRelationManyToMany, Loader};
-use crate::database::entities;
+use super::{LoadableRelationManyToMany, Loader};
+use crate::database::{entities, cache::{Cache, HasCache}};
 
 #[derive(Default)]
 pub struct PlatformRoleLoader {
-    pub cache: Cache<Uuid, entities::platform_role::Entity>,
+    pub cache: Cache<entities::platform_role::Entity>,
+}
+
+impl HasCache<entities::platform_role::Entity> for PlatformRoleLoader {
+    fn cache(&mut self) -> Cache<entities::platform_role::Entity> {
+        self.cache.clone()
+    }
 }
 
 #[async_trait::async_trait]
 impl Loader for PlatformRoleLoader {
     type LoadableEntity = entities::platform_role::Entity;
 
-    fn cache(&mut self) -> Cache<Uuid, entities::platform_role::Entity> {
-        self.cache.clone()
-    }
 }
 
 impl LoadableRelationManyToMany<entities::user::Columns> for PlatformRoleLoader {

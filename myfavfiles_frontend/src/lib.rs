@@ -11,6 +11,7 @@ use axum::routing::get_service;
 
 #[cfg(not(debug_assertions))]
 use axum::{response::Html, routing::get};
+
 #[cfg(not(debug_assertions))]
 mod assets;
 

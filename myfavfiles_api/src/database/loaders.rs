@@ -1,6 +1,5 @@
-use std::{collections::HashMap, fmt::Debug, sync::Arc};
+use std::{fmt::Debug, sync::Arc};
 
-use juniper::futures::lock::Mutex;
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
 use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
@@ -9,7 +8,7 @@ use crate::handlers::graphql::authenticated::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 
-use super::entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity};
+use super::{entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity}, cache::{Cache, HasCache}};
 
 sea_query::sea_query_driver_postgres!();
 
@@ -32,11 +31,10 @@ pub struct Loaders {
     pub user_file_share: user_file_share::UserFileShare,
 }
 
-pub type Cache<I, E> = Arc<Mutex<HashMap<I, Arc<E>>>>;
-
 #[async_trait::async_trait]
-pub trait Loader
+pub trait Loader: HasCache<Self::LoadableEntity>
 where
+    Self: std::marker::Send + Sync,
     Self::LoadableEntity: Clone
         + for<'r> FromRow<'r, PgRow>
         + Send
@@ -51,30 +49,18 @@ where
 {
     type LoadableEntity;
 
-    fn cache(&mut self) -> Cache<Uuid, Self::LoadableEntity>;
-
     async fn load_many(
         &mut self,
         ctx: &Context,
         ids: Option<Vec<Uuid>>,
     ) -> Vec<Arc<Self::LoadableEntity>> {
-        let mut results = Vec::new();
-        let mut _cache = self.cache();
-        let mut cache = _cache.lock().await;
 
-        let ids_to_load = ids.map(|ids| {
-            ids.iter().fold(Vec::new(), |mut acc, id| {
-                if let Some(item) = cache.get(id) {
-                    println!("using cache");
-                    results.push(item.clone())
-                } else {
-                    println!("no cache");
-                    acc.push(*id);
-                }
+        let cached_ids = self.all_cached().await;
+        let mut results = self.get_all(&cached_ids).await;
 
-                acc
-            })
-        });
+        let ids_to_load = ids.and_then(|ids| Some(
+            ids.into_iter().filter(|id| cached_ids.contains(id)).collect()
+        ));
 
         let columns = Self::LoadableEntity::all_columns();
         let id_column = Self::LoadableEntity::id_column();
@@ -82,6 +68,9 @@ where
         let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
         let conn = ctx.database_connection().await.unwrap();
+
+        let mut _cache = self.cache();
+        let mut cache = _cache.lock().await;
 
         Self::query(conn, sql, values)
             .await

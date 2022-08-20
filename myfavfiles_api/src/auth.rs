@@ -30,7 +30,6 @@ where
             .get(http::header::AUTHORIZATION)
             .and_then(|val| val.to_str().ok());
 
-        dbg!(&token_maybe);
         if let Some(token_str) = token_maybe {
             Token::try_from(token_str)
                 .map(Self::Ok)

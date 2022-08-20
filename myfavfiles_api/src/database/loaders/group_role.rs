@@ -1,20 +1,22 @@
 use uuid::Uuid;
 
-use super::{Cache, LoadableRelationManyToMany, LoadableRelationOneToMany, Loader};
-use crate::database::entities;
+use super::{LoadableRelationManyToMany, LoadableRelationOneToMany, Loader};
+use crate::database::{entities, cache::{HasCache, Cache}};
 
 #[derive(Default)]
 pub struct GroupRoleLoader {
-    pub cache: Cache<Uuid, entities::group_role::Entity>,
+    pub cache: Cache<entities::group_role::Entity>,
+}
+
+impl HasCache<entities::group_role::Entity> for GroupRoleLoader {
+    fn cache(&mut self) -> Cache<entities::group_role::Entity> {
+        self.cache.clone()
+    }
 }
 
 #[async_trait::async_trait]
 impl Loader for GroupRoleLoader {
     type LoadableEntity = entities::group_role::Entity;
-
-    fn cache(&mut self) -> Cache<Uuid, entities::group_role::Entity> {
-        self.cache.clone()
-    }
 }
 
 impl LoadableRelationOneToMany<entities::group::Columns> for GroupRoleLoader {}
