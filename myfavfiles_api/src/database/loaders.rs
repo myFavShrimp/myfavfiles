@@ -1,4 +1,4 @@
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt::Debug, sync::Arc, ops::DerefMut};
 
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
 use sqlx::{postgres::PgRow, FromRow};
@@ -71,8 +71,8 @@ where
         let table = Self::LoadableEntity::table();
         let (sql, values) = build_select_query(columns, table, id_column, ids_to_load);
 
-        let conn = ctx.database_connection().await.unwrap();
-
+        let mut mutex = ctx.database_connection.lock().await;
+        let conn = mutex.deref_mut();
         let mut _cache = self.cache();
         let mut cache = _cache.lock().await;
 
@@ -89,12 +89,12 @@ where
     }
 
     async fn query(
-        mut conn: super::PoolConnection,
+        conn: &mut super::PoolConnection,
         sql: String,
         values: Values,
     ) -> Vec<Self::LoadableEntity> {
         let query = bind_query_as(sqlx::query_as::<_, Self::LoadableEntity>(&sql), &values);
-        if let Ok(rows) = query.fetch_all(&mut conn).await {
+        if let Ok(rows) = query.fetch_all(conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
                 acc.push(item.clone());
 
@@ -142,9 +142,10 @@ where
     OtherColumnsEnum: Iden + Send + 'static,
 {
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
-        let mut conn = ctx.database_connection().await.unwrap();
+        let mut mutex = ctx.database_connection.lock().await;
+        let conn = mutex.deref_mut();
         let query = bind_query_as(sqlx::query_as::<_, IdEntity>(&sql), &values);
-        if let Ok(rows) = query.fetch_all(&mut conn).await {
+        if let Ok(rows) = query.fetch_all(conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
                 acc.push(item.id);
 
@@ -200,10 +201,11 @@ where
     fn associated_id(entity: Self::AssociationEntity) -> Uuid;
 
     async fn query_ids(ctx: &Context, sql: String, values: Values) -> Vec<Uuid> {
-        let mut conn = ctx.database_connection().await.unwrap();
+        let mut mutex = ctx.database_connection.lock().await;
+        let conn = mutex.deref_mut();
         let query = bind_query_as(sqlx::query_as::<_, Self::AssociationEntity>(&sql), &values);
 
-        if let Ok(rows) = query.fetch_all(&mut conn).await {
+        if let Ok(rows) = query.fetch_all(conn).await {
             rows.iter().fold(Vec::new(), |mut acc, item| {
                 acc.push(item.id());
 

@@ -13,9 +13,8 @@ pub const DATABASE_CONNECTION_ERROR_MESSAGE: &str = "Could not connect to the da
 pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database migrations.";
 pub const DATABASE_CREATION_ERROR_MESSAGE: &str = "Could not create the database.";
 
-pub async fn connection_pool(database_url: &str) -> DbPool {
-    PgPool::connect(database_url)
-        .await
+pub fn connection_pool(database_url: &str) -> DbPool {
+    PgPool::connect_lazy(database_url)
         .expect(DATABASE_CONNECTION_ERROR_MESSAGE)
 }
 
@@ -36,7 +35,7 @@ async fn create_database_if_not_exists(database_url: &str) {
 }
 
 async fn apply_migrations(database_url: &str) {
-    let pool = connection_pool(database_url).await;
+    let pool = connection_pool(database_url);
     sqlx::migrate!("../migrations")
         .run(&pool)
         .await

@@ -5,7 +5,7 @@ use tokio::sync::Mutex;
 
 use crate::{
     auth::AuthStatus,
-    database::{self, loaders::Loaders},
+    database::{loaders::Loaders},
     AppState,
 };
 
@@ -16,12 +16,11 @@ pub async fn graphql(
     auth_status: AuthStatus,
     req: Request<Body>,
 ) -> impl IntoResponse {
-    match auth_status {
+        match auth_status {
         AuthStatus::Ok(_auth_token) => {
             let context = Arc::new(graphql::authenticated::Context {
                 app_state: state.clone(),
-                database_connection_pool: database::connection_pool(&state.config.database_url)
-                    .await,
+                database_connection: Arc::new(Mutex::new(state.database_connection().await.unwrap())),
                 loaders: Arc::new(Mutex::new(Loaders::default())),
             });
 
@@ -30,8 +29,7 @@ pub async fn graphql(
         _unauthorised => {
             let context = Arc::new(graphql::unauthorised::Context {
                 app_state: state.clone(),
-                database_connection_pool: database::connection_pool(&state.config.database_url)
-                    .await,
+                database_connection: state.database_connection().await.unwrap(),
             });
 
             juniper_hyper::graphql(state.graphql_root_unauthorised.clone(), context, req).await

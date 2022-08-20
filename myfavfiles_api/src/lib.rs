@@ -12,16 +12,27 @@ pub mod auth;
 pub mod handlers;
 
 pub struct State {
-    config: Config,
+    _config: Config,
+    database_connection_pool: database::DbPool,
     graphql_root_authenticated: handlers::graphql::authenticated::Root,
     graphql_root_unauthorised: handlers::graphql::unauthorised::Root,
+}
+
+impl State {
+    pub async fn database_connection(
+        &self,
+    ) -> Result<sqlx::pool::PoolConnection<sqlx::Postgres>, sqlx::Error> {
+        self.database_connection_pool.acquire().await
+    }
 }
 
 type AppState = Arc<State>;
 
 pub async fn create_api_router(config: Config) -> Router {
+    let database_url = config.database_url.clone();
     let state = State {
-        config,
+        _config: config,
+        database_connection_pool: database::connection_pool(&database_url),
         graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
         graphql_root_unauthorised: handlers::graphql::unauthorised::create_root(),
     };
