@@ -8,7 +8,10 @@ use crate::handlers::graphql::authenticated::Context;
 
 use self::sea_query_driver_postgres::bind_query_as;
 
-use super::{entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity}, cache::HasCache};
+use super::{
+    cache::HasCache,
+    entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity},
+};
 
 sea_query::sea_query_driver_postgres!();
 
@@ -54,11 +57,14 @@ where
         ctx: &Context,
         ids: Option<Vec<Uuid>>,
     ) -> Vec<Arc<Self::LoadableEntity>> {
-
         let cached_ids = self.all_cached().await;
         let mut results = self.get_all(&cached_ids).await;
 
-        let ids_to_load = ids.map(|ids| ids.into_iter().filter(|id| cached_ids.contains(id)).collect());
+        let ids_to_load = ids.map(|ids| {
+            ids.into_iter()
+                .filter(|id| cached_ids.contains(id))
+                .collect()
+        });
 
         let columns = Self::LoadableEntity::all_columns();
         let id_column = Self::LoadableEntity::id_column();

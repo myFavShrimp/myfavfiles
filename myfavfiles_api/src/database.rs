@@ -2,9 +2,9 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
 #[macro_use]
 mod macros;
+pub mod cache;
 pub mod entities;
 pub mod loaders;
-pub mod cache;
 
 pub type DbPool = Pool<Postgres>;
 pub type PoolConnection = sqlx::pool::PoolConnection<Postgres>;

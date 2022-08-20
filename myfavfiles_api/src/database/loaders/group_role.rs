@@ -1,7 +1,10 @@
 use uuid::Uuid;
 
 use super::{LoadableRelationManyToMany, LoadableRelationOneToMany, Loader};
-use crate::database::{entities, cache::{HasCache, Cache}};
+use crate::database::{
+    cache::{Cache, HasCache},
+    entities,
+};
 
 #[derive(Default)]
 pub struct GroupRoleLoader {

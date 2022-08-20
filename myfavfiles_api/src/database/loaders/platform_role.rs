@@ -1,7 +1,10 @@
 use uuid::Uuid;
 
 use super::{LoadableRelationManyToMany, Loader};
-use crate::database::{entities, cache::{Cache, HasCache}};
+use crate::database::{
+    cache::{Cache, HasCache},
+    entities,
+};
 
 #[derive(Default)]
 pub struct PlatformRoleLoader {
@@ -17,7 +20,6 @@ impl HasCache<entities::platform_role::Entity> for PlatformRoleLoader {
 #[async_trait::async_trait]
 impl Loader for PlatformRoleLoader {
     type LoadableEntity = entities::platform_role::Entity;
-
 }
 
 impl LoadableRelationManyToMany<entities::user::Columns> for PlatformRoleLoader {

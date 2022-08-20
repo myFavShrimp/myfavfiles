@@ -1,7 +1,10 @@
 use uuid::Uuid;
 
 use super::{LoadableRelationManyToMany, Loader};
-use crate::database::{entities, cache::{Cache, HasCache}};
+use crate::database::{
+    cache::{Cache, HasCache},
+    entities,
+};
 
 #[derive(Default)]
 pub struct UserLoader {

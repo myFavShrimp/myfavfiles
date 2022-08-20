@@ -1,8 +1,7 @@
-use std::{sync::Arc, collections::HashMap};
+use std::{collections::HashMap, sync::Arc};
 
 use tokio::sync::Mutex;
 use uuid::Uuid;
-
 
 pub type Cache<E> = Arc<Mutex<HashMap<Uuid, Arc<E>>>>;
 
@@ -15,9 +14,12 @@ where
     fn cache(&mut self) -> Cache<E>;
 
     async fn all_cached(&mut self) -> Vec<Uuid> {
-        self.cache().lock().await
+        self.cache()
+            .lock()
+            .await
             .keys()
-            .into_iter().cloned()
+            .into_iter()
+            .cloned()
             .collect()
     }
 
