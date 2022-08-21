@@ -6,14 +6,12 @@ use uuid::Uuid;
 
 use crate::handlers::graphql::authenticated::Context;
 
-use self::sea_query_driver_postgres::bind_query_as;
+use crate::database::driver::bind_query_as;
 
 use super::{
     cache::HasCache,
     entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity},
 };
-
-sea_query::sea_query_driver_postgres!();
 
 pub mod group;
 pub mod group_file_share;

@@ -3,6 +3,7 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 #[macro_use]
 mod macros;
 pub mod cache;
+pub mod driver;
 pub mod entities;
 pub mod loaders;
 
