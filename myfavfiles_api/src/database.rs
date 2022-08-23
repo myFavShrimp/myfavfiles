@@ -2,6 +2,7 @@ use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
 #[macro_use]
 mod macros;
+pub mod actions;
 pub mod cache;
 pub mod driver;
 pub mod entities;
@@ -15,8 +16,7 @@ pub const DATABASE_MIGRATION_ERROR_MESSAGE: &str = "Could not apply database mig
 pub const DATABASE_CREATION_ERROR_MESSAGE: &str = "Could not create the database.";
 
 pub fn connection_pool(database_url: &str) -> DbPool {
-    PgPool::connect_lazy(database_url)
-        .expect(DATABASE_CONNECTION_ERROR_MESSAGE)
+    PgPool::connect_lazy(database_url).expect(DATABASE_CONNECTION_ERROR_MESSAGE)
 }
 
 pub async fn initialize_database(database_url: &str) {

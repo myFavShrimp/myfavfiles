@@ -1,6 +1,6 @@
-use std::{fmt::Debug, sync::Arc, ops::DerefMut};
+use std::{fmt::Debug, ops::DerefMut, sync::Arc};
 
-use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
+use sea_query::{Iden, Values};
 use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
@@ -9,6 +9,7 @@ use crate::handlers::graphql::authenticated::Context;
 use crate::database::driver::bind_query_as;
 
 use super::{
+    actions::build_select_query,
     cache::HasCache,
     entities::{AssociationEntity, IdColumn, IdEntity, RelationColumn, TableEntity},
 };
@@ -101,30 +102,6 @@ where
         } else {
             Vec::new()
         }
-    }
-}
-
-fn build_select_query<ColumnsEnum, IdType, ColumnsEnumId>(
-    columns: Vec<ColumnsEnum>,
-    table: ColumnsEnum,
-    id_column: ColumnsEnumId,
-    ids_to_load: Option<Vec<IdType>>,
-) -> (String, Values)
-where
-    ColumnsEnum: Iden + 'static,
-    IdType: Into<Value>,
-    ColumnsEnumId: Iden + 'static,
-{
-    match ids_to_load {
-        Some(ids_to_load) => Query::select()
-            .columns(columns)
-            .from(table)
-            .and_where(Expr::col(id_column).is_in(ids_to_load))
-            .build(PostgresQueryBuilder),
-        None => Query::select()
-            .columns(columns)
-            .from(table)
-            .build(PostgresQueryBuilder),
     }
 }
 

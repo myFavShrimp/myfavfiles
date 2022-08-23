@@ -3,6 +3,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 use crate::{
+    auth::token::Token,
     database::{loaders::Loaders, PoolConnection},
     AppState,
 };
@@ -14,6 +15,7 @@ pub struct Context {
     pub app_state: AppState,
     pub database_connection: Arc<Mutex<PoolConnection>>,
     pub loaders: Arc<Mutex<Loaders>>,
+    pub session_token: Token,
 }
 
 impl juniper::Context for Context {}

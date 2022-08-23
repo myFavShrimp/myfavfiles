@@ -1,10 +1,15 @@
+use std::sync::Arc;
+
+use tokio::sync::Mutex;
+
 use crate::{database::PoolConnection, AppState};
 
+pub mod object;
 pub mod query;
 
 pub struct Context {
     pub app_state: AppState,
-    pub database_connection: PoolConnection,
+    pub database_connection: Arc<Mutex<PoolConnection>>,
 }
 
 impl juniper::Context for Context {}

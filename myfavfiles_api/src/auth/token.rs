@@ -51,3 +51,29 @@ impl IntoResponse for Token {
             .into_response()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::Local;
+    use uuid::Uuid;
+
+    use super::Token;
+
+    #[test]
+    fn encode_decode() {
+        let secret = "1234567890";
+        let timestamp = Local::now().timestamp() + 1000;
+
+        let token = Token {
+            sub: Uuid::parse_str("a0c86a8a-4210-4487-bdd5-e0ecb5c31882").unwrap(),
+            jti: Uuid::parse_str("a0c86a8a-4210-4487-bdd5-e0ecb5c31882").unwrap(),
+            exp: timestamp as usize,
+        };
+
+        let encoded = token.encode(secret).unwrap();
+
+        let decoded = Token::from_encoded(encoded.as_str(), secret).unwrap();
+
+        assert_eq!(decoded, token);
+    }
+}
