@@ -46,6 +46,6 @@ impl entities::group_role::Entity {
             .load_many(context, Some(vec![self.group_id]))
             .await
             .pop()
-            .unwrap()
+            .expect("GroupRole has no associated Group")
     }
 }

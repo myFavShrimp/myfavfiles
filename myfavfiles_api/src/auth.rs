@@ -26,11 +26,12 @@ where
     type Rejection = Infallible;
 
     async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        use chrono::Local;
         if let Some(id) = Config::default().force_session {
             return Ok(Self::Ok(Token {
                 sub: id,
                 jti: id,
-                exp: 0,
+                exp: (Local::now().timestamp() * 2) as usize,
             }));
         }
 
