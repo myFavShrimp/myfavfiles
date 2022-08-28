@@ -23,3 +23,20 @@ where
             .build(PostgresQueryBuilder),
     }
 }
+
+pub fn build_insert_query<ColumnsEnum>(
+    table: ColumnsEnum,
+    columns: Vec<ColumnsEnum>,
+    values: Vec<Value>,
+) -> (String, Values)
+where
+    ColumnsEnum: Iden + 'static,
+{
+    Query::insert()
+        .into_table(table)
+        .columns(columns)
+        .values(values)
+        .unwrap()
+        .returning_all()
+        .build(PostgresQueryBuilder)
+}
