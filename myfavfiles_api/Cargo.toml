@@ -9,6 +9,13 @@ name = "myfavfiles_api"
 [[bin]]
 name = "myfavfiles_api"
 
+# Upgrading Uuid:
+# - uuid >= 1
+# - sqlx >= 0.6
+# - sea-query >= 0.26
+#   https://github.com/graphql-rust/juniper/issues/1094
+#   https://github.com/graphql-rust/juniper/milestone/4
+
 [dependencies]
 myfavfiles_common = { path = "../myfavfiles_common" }
 async-trait = "0.1.53"

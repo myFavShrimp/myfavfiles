@@ -61,7 +61,7 @@ where
 
         let ids_to_load = ids.map(|ids| {
             ids.into_iter()
-                .filter(|id| cached_ids.contains(id))
+                .filter(|id| !cached_ids.contains(id))
                 .collect()
         });
 
