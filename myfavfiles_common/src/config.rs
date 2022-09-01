@@ -11,6 +11,7 @@ pub struct Config {
     pub frontend_path: String,
     pub jwt_secret: String,
     pub force_session: Option<Uuid>,
+    pub bcrypt_cost: u32,
 }
 
 impl Config {

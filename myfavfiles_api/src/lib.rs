@@ -12,7 +12,7 @@ pub mod auth;
 pub mod handlers;
 
 pub struct State {
-    _config: Config,
+    config: Config,
     database_connection_pool: database::DbPool,
     graphql_root_authenticated: handlers::graphql::authenticated::Root,
     graphql_root_unauthorised: handlers::graphql::unauthorised::Root,
@@ -31,7 +31,7 @@ type AppState = Arc<State>;
 pub async fn create_api_router(config: Config) -> Router {
     let database_url = config.database_url.clone();
     let state = State {
-        _config: config,
+        config,
         database_connection_pool: database::connection_pool(&database_url),
         graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
         graphql_root_unauthorised: handlers::graphql::unauthorised::create_root(),
