@@ -5,7 +5,7 @@ use myfavfiles_common::config::Config;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Token {
     pub sub: Uuid,
     pub jti: Uuid,

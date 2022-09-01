@@ -1,5 +1,6 @@
 use std::{ops::DerefMut, sync::Arc};
 
+use axum::http::StatusCode;
 use juniper::FieldResult;
 use sea_query::{Expr, PostgresQueryBuilder, Query};
 
@@ -27,7 +28,6 @@ pub async fn perform_login(
         .columns(entities::user::Entity::all_columns())
         .from(entities::user::Columns::Table)
         .and_where(Expr::col(entities::user::Columns::Name).eq(username))
-        .and_where(Expr::col(entities::user::Columns::Password).eq(password))
         .build(PostgresQueryBuilder);
 
     let mut mutex = ctx.database_connection.lock().await;
@@ -39,6 +39,11 @@ pub async fn perform_login(
         .await
         .map_err(|_| USERNAME_PASSWORD_WRONG_ERROR_MESSAGE)?;
 
+    bcrypt::verify(password, &user.password)
+        .map_err(|_| ())
+        .and_then(|ok| if ok { Ok(()) } else { Err(()) })
+        .map_err(|_| USERNAME_PASSWORD_WRONG_ERROR_MESSAGE)?;
+
     let tok = Token {
         sub: user.id,
         jti: user.id,
@@ -46,7 +51,7 @@ pub async fn perform_login(
     };
 
     let encoded = tok
-        .encode(&ctx.app_state._config.jwt_secret)
+        .encode(&ctx.app_state.config.jwt_secret)
         .map_err(|_| USERNAME_PASSWORD_WRONG_ERROR_MESSAGE)?;
     Ok(encoded)
 }
@@ -56,6 +61,12 @@ pub async fn perform_registration(
     username: String,
     password: String,
 ) -> FieldResult<Arc<entities::user::Entity>> {
+    let password = bcrypt::hash(password, ctx.app_state.config.bcrypt_cost).map_err(|_| {
+        StatusCode::INTERNAL_SERVER_ERROR
+            .canonical_reason()
+            .unwrap()
+    })?;
+
     let values = vec![username.into(), password.into()];
 
     let (sql, values) = actions::build_insert_query(

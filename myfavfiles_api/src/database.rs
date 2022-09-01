@@ -7,6 +7,7 @@ pub mod cache;
 pub mod driver;
 pub mod entities;
 pub mod loaders;
+pub mod password;
 
 pub type DbPool = Pool<Postgres>;
 pub type PoolConnection = sqlx::pool::PoolConnection<Postgres>;
