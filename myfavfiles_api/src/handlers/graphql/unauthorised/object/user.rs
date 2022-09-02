@@ -10,6 +10,7 @@ use crate::{
         actions,
         driver::bind_query_as,
         entities::{self, TableEntity},
+        password,
     },
     handlers::graphql::unauthorised::Context,
 };
@@ -39,10 +40,31 @@ pub async fn perform_login(
         .await
         .map_err(|_| USERNAME_PASSWORD_WRONG_ERROR_MESSAGE)?;
 
-    bcrypt::verify(password, &user.password)
+    bcrypt::verify(&password, &user.password)
         .map_err(|_| ())
         .and_then(|ok| if ok { Ok(()) } else { Err(()) })
         .map_err(|_| USERNAME_PASSWORD_WRONG_ERROR_MESSAGE)?;
+
+    if let Ok(Some(new_hash)) = password::new_password_hash_maybe(
+        &password,
+        &user.password,
+        ctx.app_state.config.bcrypt_cost,
+    ) {
+        let (sql, values) = actions::build_update_query(
+            entities::user::Columns::Table,
+            vec![(entities::user::Columns::Password, new_hash.into())],
+            entities::user::Columns::Id,
+            user.id,
+        );
+
+        let conn = mutex.deref_mut();
+        let query = bind_query_as(sqlx::query_as::<_, entities::user::Entity>(&sql), &values);
+        query.fetch_one(conn).await.map_err(|_| {
+            StatusCode::INTERNAL_SERVER_ERROR
+                .canonical_reason()
+                .unwrap()
+        })?;
+    };
 
     let tok = Token {
         sub: user.id,

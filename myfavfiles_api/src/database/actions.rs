@@ -1,4 +1,5 @@
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
+use uuid::Uuid;
 
 pub fn build_select_query<ColumnsEnum, IdType, ColumnsEnumId>(
     columns: Vec<ColumnsEnum>,
@@ -37,6 +38,23 @@ where
         .columns(columns)
         .values(values)
         .unwrap()
+        .returning_all()
+        .build(PostgresQueryBuilder)
+}
+
+pub fn build_update_query<ColumnsEnum>(
+    table: ColumnsEnum,
+    values: Vec<(ColumnsEnum, Value)>,
+    id_column: ColumnsEnum,
+    id: Uuid,
+) -> (String, Values)
+where
+    ColumnsEnum: Iden + 'static,
+{
+    Query::update()
+        .table(table)
+        .values(values)
+        .and_where(Expr::col(id_column).eq(id))
         .returning_all()
         .build(PostgresQueryBuilder)
 }
