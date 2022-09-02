@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use myfavfiles_common::config::Config;
 use uuid::Uuid;
 
 use crate::{database::entities, database::loaders::Loader};
@@ -11,10 +10,14 @@ pub struct Query;
 
 #[juniper::graphql_object(context = Context)]
 impl Query {
-    pub fn me(context: &Context) -> String {
-        context
-            .session_token
-            .encode(&Config::default().jwt_secret)
+    async fn me(context: &Context) -> Arc<entities::user::Entity> {
+        let mut loaders = context.loaders.lock().await;
+
+        loaders
+            .user
+            .load_many(context, Some(vec![context.session_token.sub]))
+            .await
+            .pop()
             .unwrap()
     }
 
