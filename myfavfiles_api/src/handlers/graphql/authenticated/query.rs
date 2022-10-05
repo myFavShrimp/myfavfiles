@@ -1,8 +1,13 @@
-use std::sync::Arc;
+use std::{
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Loader};
+// use crate::{database::entities, database::loaders::Loader};
+
+use crate::database::{entities, loaders};
 
 use super::Context;
 
@@ -11,71 +16,53 @@ pub struct Query;
 #[juniper::graphql_object(context = Context)]
 impl Query {
     async fn me(context: &Context) -> Arc<entities::user::Entity> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders
-            .user
-            .load_many(context, Some(vec![context.session_token.sub]))
-            .await
-            .pop()
-            .unwrap()
+        loaders::cached::find_many_cached(
+            context.caches.user.clone(),
+            conn,
+            Some(vec![context.session_token.sub]),
+        )
+        .await
+        .pop()
+        .unwrap()
     }
 
     async fn users(context: &Context, ids: Option<Vec<Uuid>>) -> Vec<Arc<entities::user::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders.user.load_many(context, ids).await
-    }
-
-    async fn user(context: &Context, id: Uuid) -> Option<Arc<entities::user::Entity>> {
-        let mut loaders = context.loaders.lock().await;
-
-        loaders.user.load_many(context, Some(vec![id])).await.pop()
+        loaders::cached::find_many_cached(context.caches.user.clone(), conn, ids).await
     }
 
     async fn groups(
         context: &Context,
         ids: Option<Vec<Uuid>>,
     ) -> Vec<Arc<entities::group::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders.group.load_many(context, ids).await
-    }
-
-    async fn group(context: &Context, id: Uuid) -> Option<Arc<entities::group::Entity>> {
-        let mut loaders = context.loaders.lock().await;
-
-        loaders.group.load_many(context, Some(vec![id])).await.pop()
+        loaders::cached::find_many_cached(context.caches.group.clone(), conn, ids).await
     }
 
     async fn platform_roles(
         context: &Context,
         ids: Option<Vec<Uuid>>,
     ) -> Vec<Arc<entities::platform_role::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders.platform_role.load_many(context, ids).await
-    }
-
-    async fn platform_role(
-        context: &Context,
-        id: Uuid,
-    ) -> Option<Arc<entities::platform_role::Entity>> {
-        let mut loaders = context.loaders.lock().await;
-
-        loaders
-            .platform_role
-            .load_many(context, Some(vec![id]))
-            .await
-            .pop()
+        loaders::cached::find_many_cached(context.caches.platform_role.clone(), conn, ids).await
     }
 
     async fn group_roles(
         context: &Context,
         ids: Option<Vec<Uuid>>,
     ) -> Vec<Arc<entities::group_role::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders.group_role.load_many(context, ids).await
+        loaders::cached::find_many_cached(context.caches.group_role.clone(), conn, ids).await
     }
 }

@@ -4,7 +4,7 @@ use tokio::sync::Mutex;
 
 use crate::{
     auth::token::Token,
-    database::{loaders::Loaders, PoolConnection},
+    database::{cache::Caches, PoolConnection},
     AppState,
 };
 
@@ -14,7 +14,7 @@ pub mod query;
 pub struct Context {
     pub app_state: AppState,
     pub database_connection: Arc<Mutex<PoolConnection>>,
-    pub loaders: Arc<Mutex<Loaders>>,
+    pub caches: Caches,
     pub session_token: Token,
 }
 

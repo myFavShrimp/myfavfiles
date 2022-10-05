@@ -2,7 +2,10 @@ use juniper::GraphQLEnum;
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
-use crate::database::loaders::Identifiable;
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::ManyToManyRelation,
+};
 
 columns! {
     Table => "platform_role",
@@ -23,6 +26,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -34,12 +41,6 @@ impl super::TableEntity for Entity {
 
     fn table() -> Columns {
         Columns::Table
-    }
-}
-
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
     }
 }
 
@@ -60,5 +61,16 @@ pub enum PlatformRolePermission {
 impl PgHasArrayType for PlatformRolePermission {
     fn array_type_info() -> sqlx::postgres::PgTypeInfo {
         sqlx::postgres::PgTypeInfo::with_name("_platform_permissions_enum")
+    }
+}
+
+impl ManyToManyRelation<entities::user::Entity, entities::user_role::Entity> for Entity {
+    fn own_relation_id_column(
+    ) -> <entities::user_role::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::user_role::Columns::PlatformRoleId
+    }
+
+    fn other_entity_id(entity: entities::user_role::Entity) -> Uuid {
+        entity.platform_role_id
     }
 }

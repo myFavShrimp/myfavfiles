@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use std::{ops::DerefMut, sync::Arc};
 
 use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::LoadableRelationManyToMany};
+use crate::database::{entities, loaders};
 
 #[graphql_object(Context = Context, name = "PlatformRole")]
 impl entities::platform_role::Entity {
@@ -21,13 +21,17 @@ impl entities::platform_role::Entity {
     }
 
     async fn users(context: &Context) -> Vec<Arc<entities::user::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationManyToMany::<entities::platform_role::Columns>::load_many_related(
-            &mut loaders.user,
-            context,
-            vec![self.id],
-        )
-        .await
+        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
+            entities::platform_role::Entity,
+            entities::user::Entity,
+            entities::user_role::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(context.caches.user.clone(), conn, Some(ids_to_load))
+            .await
     }
 }

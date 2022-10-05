@@ -1,13 +1,10 @@
-use std::sync::Arc;
+use std::{ops::DerefMut, sync::Arc};
 
 use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{
-    entities,
-    loaders::{LoadableRelationManyToMany, Loader},
-};
+use crate::database::{entities, loaders};
 
 #[graphql_object(Context = Context, name = "GroupRole")]
 impl entities::group_role::Entity {
@@ -28,24 +25,34 @@ impl entities::group_role::Entity {
     }
 
     async fn group_members(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationManyToMany::<entities::group_role::Columns>::load_many_related(
-            &mut loaders.group_member,
-            context,
-            vec![self.id],
+        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
+            entities::group_role::Entity,
+            entities::group_member::Entity,
+            entities::group_member_role::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(
+            context.caches.group_member.clone(),
+            conn,
+            Some(ids_to_load),
         )
         .await
     }
 
-    async fn group(context: &Context) -> Arc<entities::group::Entity> {
-        let mut loaders = context.loaders.lock().await;
+    async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders
-            .group
-            .load_many(context, Some(vec![self.group_id]))
-            .await
-            .pop()
-            .expect("GroupRole has no associated Group")
+        loaders::cached::find_many_cached(
+            context.caches.group.clone(),
+            conn,
+            Some(vec![self.group_id]),
+        )
+        .await
+        .pop()
     }
 }

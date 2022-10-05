@@ -1,7 +1,10 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Identifiable};
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::OneToXRelation,
+};
 
 columns! {
     Table => "group_file_share",
@@ -24,6 +27,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -40,23 +47,5 @@ impl super::TableEntity for Entity {
 
     fn table() -> Columns {
         Columns::Table
-    }
-}
-
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
-    }
-}
-
-impl super::RelationColumn<entities::user::Columns> for Columns {
-    fn relation_id_column() -> Columns {
-        Columns::UserId
-    }
-}
-
-impl super::RelationColumn<entities::group::Columns> for Columns {
-    fn relation_id_column() -> Columns {
-        Columns::GroupId
     }
 }

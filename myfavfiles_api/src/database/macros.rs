@@ -1,13 +1,11 @@
 macro_rules! columns {
     ($($x: ident => $y: literal,)+) => {
-        use sea_query::Iden;
-
-        #[derive(Debug)]
+        #[derive(Debug, Eq, PartialEq)]
         pub enum Columns {
             $($x,)+
         }
 
-        impl Iden for Columns {
+        impl sea_query::Iden for Columns {
             fn unquoted(&self, s: &mut dyn std::fmt::Write) {
                 write!(
                     s,

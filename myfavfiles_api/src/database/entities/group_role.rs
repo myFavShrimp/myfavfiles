@@ -2,8 +2,10 @@ use juniper::GraphQLEnum;
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
-use crate::database::entities;
-use crate::database::loaders::Identifiable;
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::ManyToManyRelation,
+};
 
 columns! {
     Table => "group_role",
@@ -26,6 +28,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -42,12 +48,6 @@ impl super::TableEntity for Entity {
 
     fn table() -> Columns {
         Columns::Table
-    }
-}
-
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
     }
 }
 
@@ -69,8 +69,15 @@ impl PgHasArrayType for GroupRolePermission {
     }
 }
 
-impl super::RelationColumn<entities::group::Columns> for Columns {
-    fn relation_id_column() -> Columns {
-        Columns::GroupId
+impl ManyToManyRelation<entities::group_member::Entity, entities::group_member_role::Entity>
+    for Entity
+{
+    fn own_relation_id_column(
+    ) -> <entities::group_member_role::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_member_role::Columns::GroupRoleId
+    }
+
+    fn other_entity_id(entity: entities::group_member_role::Entity) -> Uuid {
+        entity.group_role_id
     }
 }

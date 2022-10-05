@@ -8,7 +8,7 @@ use axum::{
 };
 use tokio::sync::Mutex;
 
-use crate::{auth::AuthStatus, database::loaders::Loaders, AppState};
+use crate::{auth::AuthStatus, database::cache::Caches, AppState};
 
 use self::graphql::error;
 
@@ -29,7 +29,7 @@ pub async fn graphql(
             let context = Arc::new(graphql::authenticated::Context {
                 app_state: state.clone(),
                 database_connection: Arc::new(Mutex::new(database_connection)),
-                loaders: Arc::new(Mutex::new(Loaders::default())),
+                caches: Caches::default(),
                 session_token: auth_token,
             });
 

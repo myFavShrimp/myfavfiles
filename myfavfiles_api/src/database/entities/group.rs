@@ -1,6 +1,9 @@
 use uuid::Uuid;
 
-use crate::database::loaders::Identifiable;
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::OneToXRelation,
+};
 
 columns! {
     Table => "group",
@@ -19,6 +22,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -33,8 +40,23 @@ impl super::TableEntity for Entity {
     }
 }
 
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
+impl OneToXRelation<entities::group_member::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::group_member::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_member::Columns::GroupId
+    }
+}
+
+impl OneToXRelation<entities::group_file_share::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::group_file_share::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_file_share::Columns::GroupId
+    }
+}
+
+impl OneToXRelation<entities::group_role::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::group_role::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_role::Columns::GroupId
     }
 }

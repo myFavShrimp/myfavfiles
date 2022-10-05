@@ -1,13 +1,10 @@
-use std::sync::Arc;
+use std::{ops::DerefMut, sync::Arc};
 
 use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{
-    entities,
-    loaders::{LoadableRelationManyToMany, Loader},
-};
+use crate::database::{entities, loaders};
 
 #[graphql_object(Context = Context, name = "GroupMember")]
 impl entities::group_member::Entity {
@@ -27,33 +24,47 @@ impl entities::group_member::Entity {
         self.is_admin
     }
 
-    async fn group(context: &Context) -> Option<Arc<entities::group::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+    async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders
-            .group
-            .load_many(context, Some(vec![self.group_id]))
-            .await
-            .pop()
+        loaders::cached::find_many_cached(
+            context.caches.group.clone(),
+            conn,
+            Some(vec![self.group_id]),
+        )
+        .await
+        .pop()
     }
 
     async fn user(context: &Context) -> Option<Arc<entities::user::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        loaders
-            .user
-            .load_many(context, Some(vec![self.user_id]))
-            .await
-            .pop()
+        loaders::cached::find_many_cached(
+            context.caches.user.clone(),
+            conn,
+            Some(vec![self.user_id]),
+        )
+        .await
+        .pop()
     }
 
     async fn group_roles(context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationManyToMany::<entities::group_member::Columns>::load_many_related(
-            &mut loaders.group_role,
-            context,
-            vec![self.id],
+        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
+            entities::group_member::Entity,
+            entities::group_role::Entity,
+            entities::group_member_role::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(
+            context.caches.group_role.clone(),
+            conn,
+            Some(ids_to_load),
         )
         .await
     }

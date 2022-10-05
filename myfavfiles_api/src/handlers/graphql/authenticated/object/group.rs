@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use std::{ops::DerefMut, sync::Arc};
 
 use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders::LoadableRelationOneToMany};
+use crate::database::{entities, loaders};
 
 #[graphql_object(Context = Context, name = "Group")]
 impl entities::group::Entity {
@@ -16,35 +16,56 @@ impl entities::group::Entity {
         &self.name
     }
 
-    async fn group_members(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+    async fn group_members(&self, context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationOneToMany::<entities::group::Columns>::load_many_related(
-            &mut loaders.group_member,
-            context,
-            vec![self.id],
+        let ids_to_load = loaders::cacheless::find_many_ids_related::<
+            entities::group::Entity,
+            entities::group_member::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(
+            context.caches.group_member.clone(),
+            conn,
+            Some(ids_to_load),
         )
         .await
     }
 
-    async fn group_roles(context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+    async fn group_roles(&self, context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationOneToMany::<entities::group::Columns>::load_many_related(
-            &mut loaders.group_role,
-            context,
-            vec![self.id],
+        let ids_to_load = loaders::cacheless::find_many_ids_related::<
+            entities::group::Entity,
+            entities::group_role::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(
+            context.caches.group_role.clone(),
+            conn,
+            Some(ids_to_load),
         )
         .await
     }
 
     async fn file_shares(context: &Context) -> Vec<Arc<entities::group_file_share::Entity>> {
-        let mut loaders = context.loaders.lock().await;
+        let mut lock = context.database_connection.lock().await;
+        let conn = lock.deref_mut();
 
-        LoadableRelationOneToMany::<entities::group::Columns>::load_many_related(
-            &mut loaders.group_file_share,
-            context,
-            vec![self.id],
+        let ids_to_load = loaders::cacheless::find_many_ids_related::<
+            entities::group::Entity,
+            entities::group_file_share::Entity,
+        >(conn, self.id)
+        .await;
+
+        loaders::cached::find_many_cached(
+            context.caches.group_file_share.clone(),
+            conn,
+            Some(ids_to_load),
         )
         .await
     }

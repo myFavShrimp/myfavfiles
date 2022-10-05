@@ -1,7 +1,0 @@
-[tasks.create-db]
-command = "sqlx"
-args = ["database", "create"]
-
-[tasks.migrate-db]
-command = "sqlx"
-args = ["migrate", "run"]

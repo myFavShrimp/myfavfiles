@@ -1,4 +1,3 @@
-use sea_query::Iden;
 use uuid::Uuid;
 
 pub mod group;
@@ -11,10 +10,10 @@ pub mod user;
 pub mod user_file_share;
 pub mod user_role;
 
-#[derive(sqlx::FromRow, Debug, Clone)]
-#[allow(dead_code)]
-pub struct IdEntity {
-    pub id: Uuid,
+pub trait Identifiable: TableEntity {
+    fn id(&self) -> Uuid;
+
+    fn id_column() -> Self::ColumnsEnum;
 }
 
 pub trait TableEntity {
@@ -25,14 +24,48 @@ pub trait TableEntity {
     fn table() -> Self::ColumnsEnum;
 }
 
-pub trait IdColumn: TableEntity {
-    fn id_column() -> Self::ColumnsEnum;
-}
+pub mod id_entity {
+    use uuid::Uuid;
 
-pub trait AssociationEntity<OtherColumnsEnum> {
-    fn id(&self) -> Uuid;
-}
+    use super::{Identifiable, TableEntity};
 
-pub trait RelationColumn<OtherColumnsEnum>: Iden {
-    fn relation_id_column() -> Self;
+    columns! {
+        Id => "id",
+    }
+
+    #[derive(sqlx::FromRow, Debug, Clone)]
+    #[allow(dead_code)]
+    pub struct IdEntity {
+        pub id: Uuid,
+    }
+
+    impl TableEntity for IdEntity {
+        type ColumnsEnum = Columns;
+
+        fn all_columns() -> Vec<Self::ColumnsEnum> {
+            vec![Columns::Id]
+        }
+
+        fn table() -> Self::ColumnsEnum {
+            panic!("IdEntity does not have a table")
+        }
+    }
+
+    impl Identifiable for IdEntity {
+        fn id(&self) -> Uuid {
+            self.id
+        }
+
+        fn id_column() -> Self::ColumnsEnum {
+            Columns::Id
+        }
+    }
+
+    pub fn into_vec_uuid(items: impl Iterator<Item = IdEntity>) -> Vec<Uuid> {
+        items.fold(Vec::new(), |mut acc, item| {
+            acc.push(item.id);
+
+            acc
+        })
+    }
 }

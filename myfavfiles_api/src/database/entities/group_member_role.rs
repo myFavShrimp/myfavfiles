@@ -1,9 +1,5 @@
 use uuid::Uuid;
 
-use crate::database::entities;
-
-use super::AssociationEntity;
-
 columns! {
     Table => "group_member_role",
     GroupMemberId => "group_member_id",
@@ -26,29 +22,5 @@ impl super::TableEntity for Entity {
 
     fn table() -> Columns {
         Columns::Table
-    }
-}
-
-impl AssociationEntity<entities::group_role::Columns> for Entity {
-    fn id(&self) -> Uuid {
-        self.group_role_id
-    }
-}
-
-impl AssociationEntity<entities::group_member::Columns> for Entity {
-    fn id(&self) -> Uuid {
-        self.group_member_id
-    }
-}
-
-impl super::RelationColumn<entities::group_member::Columns> for Columns {
-    fn relation_id_column() -> Self {
-        Columns::GroupMemberId
-    }
-}
-
-impl super::RelationColumn<entities::group_role::Columns> for Columns {
-    fn relation_id_column() -> Self {
-        Columns::GroupRoleId
     }
 }

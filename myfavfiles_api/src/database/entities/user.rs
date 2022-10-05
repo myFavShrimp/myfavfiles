@@ -1,6 +1,9 @@
 use uuid::Uuid;
 
-use crate::database::loaders::Identifiable;
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::{ManyToManyRelation, OneToXRelation},
+};
 
 columns! {
     Table => "user",
@@ -23,6 +26,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -42,8 +49,34 @@ impl super::TableEntity for Entity {
     }
 }
 
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
+impl OneToXRelation<entities::group_member::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::group_member::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_member::Columns::UserId
+    }
+}
+
+impl OneToXRelation<entities::group_file_share::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::group_file_share::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_file_share::Columns::UserId
+    }
+}
+
+impl OneToXRelation<entities::user_file_share::Entity> for Entity {
+    fn target_relation_id_column(
+    ) -> <entities::user_file_share::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::user_file_share::Columns::UserId
+    }
+}
+
+impl ManyToManyRelation<entities::platform_role::Entity, entities::user_role::Entity> for Entity {
+    fn own_relation_id_column(
+    ) -> <entities::user_role::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::user_role::Columns::UserId
+    }
+
+    fn other_entity_id(entity: entities::user_role::Entity) -> Uuid {
+        entity.user_id
     }
 }

@@ -1,16 +1,15 @@
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
 use uuid::Uuid;
 
-pub fn build_select_query<ColumnsEnum, IdType, ColumnsEnumId>(
+pub fn build_select_query<ColumnsEnum, IdType>(
     columns: Vec<ColumnsEnum>,
     table: ColumnsEnum,
-    id_column: ColumnsEnumId,
+    id_column: ColumnsEnum,
     ids_to_load: Option<Vec<IdType>>,
 ) -> (String, Values)
 where
     ColumnsEnum: Iden + 'static,
     IdType: Into<Value>,
-    ColumnsEnumId: Iden + 'static,
 {
     match ids_to_load {
         Some(ids_to_load) => Query::select()

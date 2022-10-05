@@ -1,6 +1,9 @@
 use uuid::Uuid;
 
-use crate::{database::entities, database::loaders::Identifiable};
+use crate::database::{
+    entities::{self, Identifiable},
+    relation::{ManyToManyRelation, OneToXRelation},
+};
 
 columns! {
     Table => "group_member",
@@ -23,6 +26,10 @@ impl Identifiable for Entity {
     fn id(&self) -> Uuid {
         self.id
     }
+
+    fn id_column() -> Columns {
+        Columns::Id
+    }
 }
 
 impl super::TableEntity for Entity {
@@ -42,20 +49,15 @@ impl super::TableEntity for Entity {
     }
 }
 
-impl super::IdColumn for Entity {
-    fn id_column() -> Columns {
-        Columns::Id
+impl ManyToManyRelation<entities::group_role::Entity, entities::group_member_role::Entity>
+    for Entity
+{
+    fn own_relation_id_column(
+    ) -> <entities::group_member_role::Entity as entities::TableEntity>::ColumnsEnum {
+        entities::group_member_role::Columns::GroupMemberId
     }
-}
 
-impl super::RelationColumn<entities::user::Columns> for Columns {
-    fn relation_id_column() -> Columns {
-        Columns::UserId
-    }
-}
-
-impl super::RelationColumn<entities::group::Columns> for Columns {
-    fn relation_id_column() -> Columns {
-        Columns::GroupId
+    fn other_entity_id(entity: entities::group_member_role::Entity) -> Uuid {
+        entity.group_member_id
     }
 }
