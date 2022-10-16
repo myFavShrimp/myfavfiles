@@ -48,14 +48,15 @@ impl super::TableEntity for Entity {
 #[sqlx(type_name = "platform_permissions_enum", rename_all = "snake_case")]
 
 pub enum PlatformRolePermission {
-    CreateInviteCode,
-    BanUser,
-    Administrator,
-    ManageGroups,
-    CreateGroups,
-    UploadFiles,
-    DeleteFiles,
-    ManageRoles,
+    CreateInviteCode,  // -- invite users to platform
+    Administrator,     // -- everything
+    HasPrivateStorage, // -- crud user files
+    ManageRoles,       // -- crud roles + user assignement, only permissions of self
+    SeeUsers,          // --list users
+    BanUsers,
+    SeeGroups,    // -- list groups, no access
+    ManageGroups, // ? -- crud & file access
+    CreateGroups, // -- creator will become admin of group
 }
 
 impl PgHasArrayType for PlatformRolePermission {

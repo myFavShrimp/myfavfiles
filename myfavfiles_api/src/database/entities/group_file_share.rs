@@ -1,10 +1,7 @@
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
-use crate::database::{
-    entities::{self, Identifiable},
-    relation::OneToXRelation,
-};
+use crate::database::entities::Identifiable;
 
 columns! {
     Table => "group_file_share",

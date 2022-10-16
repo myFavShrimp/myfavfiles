@@ -66,12 +66,7 @@ where
     let relation_id_column = <A as OneToXRelation<B>>::target_relation_id_column();
     let columns = vec![B::id_column()];
     let table = B::table();
-    let (sql, values) = dbg!(build_select_query(
-        columns,
-        table,
-        relation_id_column,
-        Some(vec![a_id])
-    ));
+    let (sql, values) = build_select_query(columns, table, relation_id_column, Some(vec![a_id]));
 
     let id_entites = query_ids(db_conn, sql, values).await;
 

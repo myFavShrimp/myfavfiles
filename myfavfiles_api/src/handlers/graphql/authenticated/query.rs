@@ -1,15 +1,9 @@
-use std::{
-    ops::{Deref, DerefMut},
-    sync::Arc,
-};
+use std::{ops::DerefMut, sync::Arc};
 
 use uuid::Uuid;
 
-// use crate::{database::entities, database::loaders::Loader};
-
-use crate::database::{entities, loaders};
-
 use super::Context;
+use crate::database::{entities, loaders};
 
 pub struct Query;
 

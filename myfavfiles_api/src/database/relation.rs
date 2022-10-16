@@ -3,8 +3,6 @@ use uuid::Uuid;
 
 use super::entities::{Identifiable, TableEntity};
 
-pub mod implementation;
-
 pub trait OneToXRelation<B>
 where
     B: TableEntity + Identifiable,

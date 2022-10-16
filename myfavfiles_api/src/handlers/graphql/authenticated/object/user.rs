@@ -20,17 +20,18 @@ impl entities::user::Entity {
         self.is_admin
     }
 
-    async fn group_memberships(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
+    async fn group_memberships(
+        &self,
+        context: &Context,
+    ) -> Vec<Arc<entities::group_member::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = dbg!(
-            loaders::cacheless::find_many_ids_related::<
-                entities::user::Entity,
-                entities::group_member::Entity,
-            >(conn, self.id)
-            .await
-        );
+        let ids_to_load = loaders::cacheless::find_many_ids_related::<
+            entities::user::Entity,
+            entities::group_member::Entity,
+        >(conn, self.id)
+        .await;
 
         loaders::cached::find_many_cached(
             context.caches.group_member.clone(),

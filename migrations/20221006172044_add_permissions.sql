@@ -1,0 +1,23 @@
+--CREATE TYPE platform_permissions_enum AS ENUM (
+--    'create_invite_code', -- invite users to platform
+--    'administrator', -- everything
+--    'has_files_storage', -- crud user files
+--    'manage_roles' -- crud roles + user assignement, only permissions of self
+--	'see_users' --list users
+--    'ban_user',
+--	'see_groups', -- list groups, no access
+--    'manage_groups', -- crud & file access
+--    'create_groups', -- creator will become admin of group
+--);
+
+--CREATE TYPE group_permissions_enum AS ENUM (
+--	-- implicit permissions:
+--	-- see users
+--	-- read files
+--    'create_invite_code', -- invite users to group
+--    'kick_user',
+--    'administrator', -- everything
+--    'upload_files',
+--    'delete_files',
+--    'manage_roles', -- crud groups roles, only permissions of self
+--);

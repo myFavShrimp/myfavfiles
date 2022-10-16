@@ -2,7 +2,7 @@ use uuid::Uuid;
 
 use crate::database::{
     entities::{self, Identifiable},
-    relation::{ManyToManyRelation, OneToXRelation},
+    relation::ManyToManyRelation,
 };
 
 columns! {
