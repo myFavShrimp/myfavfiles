@@ -1,4 +1,4 @@
---CREATE TYPE platform_permissions_enum AS ENUM (
+-- CREATE TYPE platform_permissions_enum AS ENUM (
 --    'create_invite_code', -- invite users to platform
 --    'administrator', -- everything
 --    'has_files_storage', -- crud user files
