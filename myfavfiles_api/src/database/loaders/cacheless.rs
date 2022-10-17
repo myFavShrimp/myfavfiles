@@ -35,7 +35,7 @@ pub async fn query_ids(conn: &mut PoolConnection, sql: String, values: Values) -
     query(conn, sql, values).await
 }
 
-pub async fn find_many<E>(mut db_conn: &mut PoolConnection, ids: Option<Vec<Uuid>>) -> Vec<E>
+pub async fn find_many<E>(db_conn: &mut PoolConnection, ids: Option<Vec<Uuid>>) -> Vec<E>
 where
     E: Clone
         + for<'r> FromRow<'r, PgRow>
@@ -53,7 +53,7 @@ where
     let table = E::table();
     let (sql, values) = build_select_query(columns, table, id_column, ids);
 
-    query(&mut db_conn, sql, values).await
+    query(db_conn, sql, values).await
 }
 
 pub async fn find_many_ids_related<A, B>(db_conn: &mut PoolConnection, a_id: Uuid) -> Vec<Uuid>
