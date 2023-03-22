@@ -12,7 +12,7 @@ use crate::{
         entities::{self, TableEntity},
         password,
     },
-    handlers::graphql::unauthorised::Context,
+    handlers::graphql::public::Context,
 };
 
 const USERNAME_PASSWORD_WRONG_ERROR_MESSAGE: &str = "Username or password wrong!";

@@ -1,6 +1,6 @@
 use juniper::FieldResult;
 
-use crate::handlers::graphql::unauthorised::object;
+use crate::handlers::graphql::public::object;
 
 use super::Context;
 

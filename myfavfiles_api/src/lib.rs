@@ -14,8 +14,8 @@ pub mod handlers;
 pub struct State {
     config: Config,
     database_connection_pool: database::DbPool,
-    graphql_root_authenticated: handlers::graphql::authenticated::Root,
-    graphql_root_unauthorised: handlers::graphql::unauthorised::Root,
+    graphql_root_authenticated: handlers::graphql::PrivateRoot,
+    graphql_root_unauthorised: handlers::graphql::PublicRoot,
 }
 
 impl State {
@@ -33,14 +33,14 @@ pub async fn create_api_router(config: Config) -> Router {
     let state = State {
         config,
         database_connection_pool: database::connection_pool(&database_url),
-        graphql_root_authenticated: handlers::graphql::authenticated::create_root(),
-        graphql_root_unauthorised: handlers::graphql::unauthorised::create_root(),
+        graphql_root_authenticated: handlers::graphql::create_private_root(),
+        graphql_root_unauthorised: handlers::graphql::create_public_root(),
     };
 
     let app_state: AppState = Arc::new(state);
 
     Router::new()
-        .route("/graphql", post(handlers::graphql))
-        .route("/playground", get(handlers::playground))
+        .route("/graphql", post(handlers::graphql::graphql))
+        .route("/playground", get(handlers::graphql::playground))
         .layer(ServiceBuilder::new().layer(Extension(app_state)))
 }
