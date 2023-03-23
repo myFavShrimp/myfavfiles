@@ -58,6 +58,6 @@ impl ManyToManyRelation<entities::group_role::Entity, entities::group_member_rol
     }
 
     fn other_entity_id(entity: entities::group_member_role::Entity) -> Uuid {
-        entity.group_member_id
+        entity.group_role_id
     }
 }

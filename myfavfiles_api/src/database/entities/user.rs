@@ -77,6 +77,6 @@ impl ManyToManyRelation<entities::platform_role::Entity, entities::user_role::En
     }
 
     fn other_entity_id(entity: entities::user_role::Entity) -> Uuid {
-        entity.user_id
+        entity.platform_role_id
     }
 }
