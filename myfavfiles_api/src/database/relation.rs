@@ -11,13 +11,16 @@ where
     fn target_relation_id_column() -> B::ColumnsEnum;
 }
 
+/// Helper trait to define many to many relations on database tables.
 pub trait ManyToManyRelation<B, R>
 where
     B: TableEntity + Identifiable,
     R: TableEntity,
 {
+    /// Id column on the relational table for the struct the trait is being implemented for.
     fn own_relation_id_column() -> R::ColumnsEnum;
 
+    /// Id field of the destination table on the relational struct. .
     fn other_entity_id(entity: R) -> Uuid;
 }
 
