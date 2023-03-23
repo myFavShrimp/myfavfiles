@@ -141,7 +141,7 @@ mod test {
 
     impl ManyToManyRelation<b::Entity, r::Entity> for a::Entity {
         fn own_relation_id_column() -> <r::Entity as TableEntity>::ColumnsEnum {
-            r::Columns::BId
+            r::Columns::AId
         }
 
         fn other_entity_id(entity: r::Entity) -> Uuid {
@@ -150,7 +150,7 @@ mod test {
     }
     impl ManyToManyRelation<a::Entity, r::Entity> for b::Entity {
         fn own_relation_id_column() -> <r::Entity as TableEntity>::ColumnsEnum {
-            r::Columns::AId
+            r::Columns::BId
         }
 
         fn other_entity_id(entity: r::Entity) -> Uuid {
@@ -169,9 +169,9 @@ mod test {
 
     #[test]
     fn many_to_many() {
-        let r_bid =
-            <a::Entity as ManyToManyRelation<b::Entity, r::Entity>>::own_relation_id_column();
         let r_aid =
+            <a::Entity as ManyToManyRelation<b::Entity, r::Entity>>::own_relation_id_column();
+        let r_bid =
             <b::Entity as ManyToManyRelation<a::Entity, r::Entity>>::own_relation_id_column();
 
         assert!(r_bid == r::Columns::BId);
