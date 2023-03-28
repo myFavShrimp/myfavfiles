@@ -9,6 +9,7 @@ use crate::{
 };
 
 mod data;
+pub mod mutation;
 mod object;
 pub mod query;
 
@@ -25,7 +26,7 @@ pub type Root = std::sync::Arc<
     juniper::RootNode<
         'static,
         query::Query,
-        juniper::EmptyMutation<Context>,
+        mutation::Mutation,
         juniper::EmptySubscription<Context>,
     >,
 >;
@@ -33,7 +34,7 @@ pub type Root = std::sync::Arc<
 pub fn create_root() -> Root {
     std::sync::Arc::new(juniper::RootNode::new(
         query::Query,
-        juniper::EmptyMutation::<Context>::new(),
+        mutation::Mutation,
         juniper::EmptySubscription::<Context>::new(),
     ))
 }
