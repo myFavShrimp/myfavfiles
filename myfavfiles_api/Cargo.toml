@@ -3,12 +3,6 @@ name = "myfavfiles_api"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "myfavfiles_api"
-
-[[bin]]
-name = "myfavfiles_api"
-
 # Upgrading Uuid:
 # - uuid >= 1
 # - sqlx >= 0.6
