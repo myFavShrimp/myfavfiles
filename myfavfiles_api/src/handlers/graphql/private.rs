@@ -9,9 +9,9 @@ use crate::{
 };
 
 mod data;
-pub mod mutation;
 mod object;
-pub mod query;
+pub mod mutation_schema;
+pub mod query_schema;
 
 pub struct Context {
     pub app_state: AppState,
@@ -25,16 +25,16 @@ impl juniper::Context for Context {}
 pub type Root = std::sync::Arc<
     juniper::RootNode<
         'static,
-        query::Query,
-        mutation::Mutation,
+        query_schema::Query,
+        mutation_schema::Mutation,
         juniper::EmptySubscription<Context>,
     >,
 >;
 
 pub fn create_root() -> Root {
     std::sync::Arc::new(juniper::RootNode::new(
-        query::Query,
-        mutation::Mutation,
+        query_schema::Query,
+        mutation_schema::Mutation,
         juniper::EmptySubscription::<Context>::new(),
     ))
 }

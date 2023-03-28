@@ -5,6 +5,14 @@ use uuid::Uuid;
 use super::Context;
 use crate::database::{entities, loaders};
 
+mod group;
+mod group_file_share;
+mod group_member;
+mod group_role;
+mod platform_role;
+mod user;
+mod user_file_share;
+
 pub struct Query;
 
 #[juniper::graphql_object(context = Context)]
