@@ -5,7 +5,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders};
+use crate::{database::entities, handlers::graphql::private::data};
 
 #[graphql_object(Context = Context, name = "GroupFileShare")]
 impl entities::group_file_share::Entity {
@@ -27,27 +27,19 @@ impl entities::group_file_share::Entity {
 
     async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
         let mut lock = context.database_connection.lock().await;
-        let conn = lock.deref_mut();
+        let db_connection = lock.deref_mut();
 
-        loaders::cached::find_many_cached(
-            context.caches.group.clone(),
-            conn,
-            Some(vec![self.group_id]),
-        )
-        .await
-        .pop()
+        let cache = context.caches.group.clone();
+
+        data::group::group_by_id(db_connection, cache, self.id).await
     }
 
     async fn user(&self, context: &Context) -> Option<Arc<entities::user::Entity>> {
         let mut lock = context.database_connection.lock().await;
-        let conn = lock.deref_mut();
+        let db_connection = lock.deref_mut();
 
-        loaders::cached::find_many_cached(
-            context.caches.user.clone(),
-            conn,
-            Some(vec![self.user_id]),
-        )
-        .await
-        .pop()
+        let cache = context.caches.user.clone();
+
+        data::user::user_by_id(db_connection, cache, self.user_id).await
     }
 }

@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders};
+use crate::{database::entities, handlers::graphql::private::data};
 
 #[graphql_object(Context = Context, name = "GroupRole")]
 impl entities::group_role::Entity {
@@ -28,31 +28,17 @@ impl entities::group_role::Entity {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
-            entities::group_role::Entity,
-            entities::group_member::Entity,
-            entities::group_member_role::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.group_member.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.group_member.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::group_member::group_memberships_by_group_role_id(conn, cache, self.id).await
     }
 
     async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        loaders::cached::find_many_cached(
-            context.caches.group.clone(),
-            conn,
-            Some(vec![self.group_id]),
-        )
-        .await
-        .pop()
+        let cache = context.caches.group.clone();
+
+        data::group::group_by_id(conn, cache, self.group_id).await
     }
 }

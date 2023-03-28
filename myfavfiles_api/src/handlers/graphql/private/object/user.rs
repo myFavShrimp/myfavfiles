@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders};
+use crate::{database::entities, handlers::graphql::private::data};
 
 #[graphql_object(Context = Context, name = "User")]
 impl entities::user::Entity {
@@ -27,72 +27,35 @@ impl entities::user::Entity {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related::<
-            entities::user::Entity,
-            entities::group_member::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.group_member.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.group_member.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::group_member::group_memberships_by_user_id(conn, cache, self.id).await
     }
 
     async fn platform_roles(context: &Context) -> Vec<Arc<entities::platform_role::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
-            entities::user::Entity,
-            entities::platform_role::Entity,
-            entities::user_role::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.platform_role.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.platform_role.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::platform_role::platform_role_by_user_id(conn, cache, self.id).await
     }
 
     async fn group_file_shares(context: &Context) -> Vec<Arc<entities::group_file_share::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related::<
-            entities::user::Entity,
-            entities::group_file_share::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.group_file_share.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.group_file_share.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::group_file_share::group_file_shares_by_user_id(conn, cache, self.id).await
     }
 
     async fn file_shares(context: &Context) -> Vec<Arc<entities::user_file_share::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related::<
-            entities::user::Entity,
-            entities::user_file_share::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.user_file_share.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.user_file_share.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::user_file_share::user_file_shares_by_user_id(conn, cache, self.id).await
     }
 }

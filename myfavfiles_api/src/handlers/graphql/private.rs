@@ -8,6 +8,7 @@ use crate::{
     AppState,
 };
 
+mod data;
 mod object;
 pub mod query;
 

@@ -4,7 +4,7 @@ use juniper::graphql_object;
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::database::{entities, loaders};
+use crate::{database::entities, handlers::graphql::private::data};
 
 #[graphql_object(Context = Context, name = "GroupMember")]
 impl entities::group_member::Entity {
@@ -28,44 +28,26 @@ impl entities::group_member::Entity {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        loaders::cached::find_many_cached(
-            context.caches.group.clone(),
-            conn,
-            Some(vec![self.group_id]),
-        )
-        .await
-        .pop()
+        let cache = context.caches.group.clone();
+
+        data::group::group_by_id(conn, cache, self.group_id).await
     }
 
     async fn user(context: &Context) -> Option<Arc<entities::user::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        loaders::cached::find_many_cached(
-            context.caches.user.clone(),
-            conn,
-            Some(vec![self.user_id]),
-        )
-        .await
-        .pop()
+        let cache = context.caches.user.clone();
+
+        data::user::user_by_id(conn, cache, self.user_id).await
     }
 
     async fn group_roles(context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        let ids_to_load = loaders::cacheless::find_many_ids_related_associative::<
-            entities::group_member::Entity,
-            entities::group_role::Entity,
-            entities::group_member_role::Entity,
-        >(conn, self.id)
-        .await;
+        let cache = context.caches.group_role.clone();
 
-        loaders::cached::find_many_cached(
-            context.caches.group_role.clone(),
-            conn,
-            Some(ids_to_load),
-        )
-        .await
+        data::group_role::group_roles_by_group_member_id(conn, cache, self.id).await
     }
 }
