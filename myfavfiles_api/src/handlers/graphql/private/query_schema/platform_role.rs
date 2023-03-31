@@ -1,6 +1,6 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
@@ -20,12 +20,12 @@ impl entities::platform_role::Entity {
         self.permissions.clone()
     }
 
-    async fn users(context: &Context) -> Vec<Arc<entities::user::Entity>> {
+    async fn users(context: &Context) -> FieldResult<Vec<Arc<entities::user::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.user.clone();
 
-        data::user::user_by_platform_role_id(conn, cache, self.id).await
+        Ok(data::user::user_by_platform_role_id(conn, cache, self.id).await?)
     }
 }

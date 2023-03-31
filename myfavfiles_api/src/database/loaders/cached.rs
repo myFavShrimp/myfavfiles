@@ -10,13 +10,13 @@ use crate::database::{
     PoolConnection,
 };
 
-use super::cacheless::find_many;
+use super::{cacheless::find_many, LoaderError};
 
 pub async fn find_many_cached<E>(
     cache: Cache<E>,
     db_conn: &mut PoolConnection,
     ids: Option<Vec<Uuid>>,
-) -> Vec<Arc<E>>
+) -> Result<Vec<Arc<E>>, LoaderError>
 where
     E: Clone
         + for<'r> FromRow<'r, PgRow>
@@ -43,12 +43,13 @@ where
     let mut cache_map = cache_lock.lock().await;
 
     find_many::<E>(db_conn, ids_to_load)
-        .await
-        .iter()
+        .await?
+        .into_iter()
         .for_each(|item| {
             let arc_item = Arc::new(item.clone());
             cache_map.insert(arc_item.id(), arc_item.clone());
             results.push(arc_item);
         });
-    results
+
+    Ok(results)
 }

@@ -1,6 +1,6 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
@@ -24,30 +24,30 @@ impl entities::group_member::Entity {
         self.is_admin
     }
 
-    async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
+    async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.group.clone();
 
-        data::group::group_by_id(conn, cache, self.group_id).await
+        Ok(data::group::group_by_id(conn, cache, self.group_id).await?)
     }
 
-    async fn user(context: &Context) -> Option<Arc<entities::user::Entity>> {
+    async fn user(context: &Context) -> FieldResult<Option<Arc<entities::user::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.user.clone();
 
-        data::user::user_by_id(conn, cache, self.user_id).await
+        Ok(data::user::user_by_id(conn, cache, self.user_id).await?)
     }
 
-    async fn group_roles(context: &Context) -> Vec<Arc<entities::group_role::Entity>> {
+    async fn group_roles(context: &Context) -> FieldResult<Vec<Arc<entities::group_role::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.group_role.clone();
 
-        data::group_role::group_roles_by_group_member_id(conn, cache, self.id).await
+        Ok(data::group_role::group_roles_by_group_member_id(conn, cache, self.id).await?)
     }
 }

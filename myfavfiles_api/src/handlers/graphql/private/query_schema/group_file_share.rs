@@ -1,7 +1,7 @@
 use std::{ops::DerefMut, sync::Arc};
 
 use chrono::NaiveDateTime;
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
@@ -25,21 +25,21 @@ impl entities::group_file_share::Entity {
         self.expiration
     }
 
-    async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
+    async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let db_connection = lock.deref_mut();
 
         let cache = context.caches.group.clone();
 
-        data::group::group_by_id(db_connection, cache, self.id).await
+        Ok(data::group::group_by_id(db_connection, cache, self.id).await?)
     }
 
-    async fn user(&self, context: &Context) -> Option<Arc<entities::user::Entity>> {
+    async fn user(&self, context: &Context) -> FieldResult<Option<Arc<entities::user::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let db_connection = lock.deref_mut();
 
         let cache = context.caches.user.clone();
 
-        data::user::user_by_id(db_connection, cache, self.user_id).await
+        Ok(data::user::user_by_id(db_connection, cache, self.user_id).await?)
     }
 }

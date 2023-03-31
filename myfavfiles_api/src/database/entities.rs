@@ -60,12 +60,4 @@ pub mod id_entity {
             Columns::Id
         }
     }
-
-    pub fn into_vec_uuid(items: impl Iterator<Item = IdEntity>) -> Vec<Uuid> {
-        items.fold(Vec::new(), |mut acc, item| {
-            acc.push(item.id);
-
-            acc
-        })
-    }
 }

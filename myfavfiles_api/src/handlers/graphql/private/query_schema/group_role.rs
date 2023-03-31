@@ -1,6 +1,6 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
@@ -24,21 +24,23 @@ impl entities::group_role::Entity {
         self.permissions.clone()
     }
 
-    async fn group_members(context: &Context) -> Vec<Arc<entities::group_member::Entity>> {
+    async fn group_members(
+        context: &Context,
+    ) -> FieldResult<Vec<Arc<entities::group_member::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.group_member.clone();
 
-        data::group_member::group_memberships_by_group_role_id(conn, cache, self.id).await
+        Ok(data::group_member::group_memberships_by_group_role_id(conn, cache, self.id).await?)
     }
 
-    async fn group(&self, context: &Context) -> Option<Arc<entities::group::Entity>> {
+    async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         let cache = context.caches.group.clone();
 
-        data::group::group_by_id(conn, cache, self.group_id).await
+        Ok(data::group::group_by_id(conn, cache, self.group_id).await?)
     }
 }
