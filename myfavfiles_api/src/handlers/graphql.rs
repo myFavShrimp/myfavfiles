@@ -27,8 +27,8 @@ pub async fn graphql(
     req: Request<Body>,
 ) -> impl IntoResponse {
     let database_connection = match state.database_connection().await {
-        Ok(db_connection) => db_connection,
-        Err(_) => return error::graphql_error_response(StatusCode::INTERNAL_SERVER_ERROR, None),
+        Ok(conn) => conn,
+        Err(e) => return error::graphql_error_response(StatusCode::INTERNAL_SERVER_ERROR, e),
     };
 
     match auth_status {
