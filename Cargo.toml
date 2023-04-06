@@ -10,6 +10,6 @@ members = [
 axum = "0.5.16"
 
 [workspace.dependencies.tokio]
-version = "1.18.1"
+version = "1.18.5"
 features = ["full"]
 
