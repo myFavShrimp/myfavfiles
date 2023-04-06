@@ -9,8 +9,9 @@ edition = "2021"
 myfavfiles_api = { path = "../myfavfiles_api" }
 myfavfiles_common = { path = "../myfavfiles_common" }
 myfavfiles_frontend = { path = "../myfavfiles_frontend" }
-axum = "0.5.16"
+
+[dependencies.axum]
+workspace = true
 
 [dependencies.tokio]
-version = "1.18.1"
-features = ["full"]
+workspace = true

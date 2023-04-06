@@ -13,14 +13,15 @@ name = "myfavfiles_frontend"
 
 [dependencies]
 myfavfiles_common = { path = "../myfavfiles_common" }
-axum = "0.5.16"
 iftree = "1.0.3"
 tower = "0.4.12"
+
+[dependencies.axum]
+workspace = true
 
 [dependencies.tower-http]
 version = "0.3.2"
 features = ["fs", "trace"]
 
 [dependencies.tokio]
-version = "1.18.1"
-features = ["full"]
+workspace = true

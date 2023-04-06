@@ -5,3 +5,11 @@ members = [
     "myfavfiles_common",
     "myfavfiles_frontend",
 ]
+
+[workspace.dependencies]
+axum = "0.5.16"
+
+[workspace.dependencies.tokio]
+version = "1.18.1"
+features = ["full"]
+
