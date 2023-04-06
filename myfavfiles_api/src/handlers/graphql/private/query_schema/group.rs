@@ -4,7 +4,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "Group")]
 impl entities::group::Entity {
@@ -25,7 +25,7 @@ impl entities::group::Entity {
 
         let cache = context.caches.group_member.clone();
 
-        Ok(data::group_member::group_memberships_by_group_id(conn, cache, self.id).await?)
+        Ok(repository::group_member::group_memberships_by_group_id(conn, cache, self.id).await?)
     }
 
     async fn group_roles(
@@ -37,7 +37,7 @@ impl entities::group::Entity {
 
         let cache = context.caches.group_role.clone();
 
-        Ok(data::group_role::group_roles_by_group_id(conn, cache, self.id).await?)
+        Ok(repository::group_role::group_roles_by_group_id(conn, cache, self.id).await?)
     }
 
     async fn file_shares(
@@ -48,6 +48,9 @@ impl entities::group::Entity {
 
         let cache = context.caches.group_file_share.clone();
 
-        Ok(data::group_file_share::group_file_shares_by_group_id(conn, cache, self.id).await?)
+        Ok(
+            repository::group_file_share::group_file_shares_by_group_id(conn, cache, self.id)
+                .await?,
+        )
     }
 }

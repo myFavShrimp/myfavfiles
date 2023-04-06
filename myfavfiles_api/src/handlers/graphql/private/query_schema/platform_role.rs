@@ -4,7 +4,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "PlatformRole")]
 impl entities::platform_role::Entity {
@@ -26,6 +26,6 @@ impl entities::platform_role::Entity {
 
         let cache = context.caches.user.clone();
 
-        Ok(data::user::user_by_platform_role_id(conn, cache, self.id).await?)
+        Ok(repository::user::user_by_platform_role_id(conn, cache, self.id).await?)
     }
 }

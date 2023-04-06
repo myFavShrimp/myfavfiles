@@ -4,10 +4,7 @@ use juniper::FieldResult;
 use uuid::Uuid;
 
 use super::Context;
-use crate::{
-    database::{entities, loaders},
-    handlers::graphql::private::data,
-};
+use crate::database::{entities, repository};
 
 mod group;
 mod group_file_share;
@@ -25,11 +22,13 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(
-            data::user::user_by_id(conn, context.caches.user.clone(), context.session_token.sub)
-                .await?
-                .unwrap(),
+        Ok(repository::user::user_by_id(
+            conn,
+            context.caches.user.clone(),
+            context.session_token.sub,
         )
+        .await?
+        .unwrap())
     }
 
     async fn users(
@@ -39,7 +38,7 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(data::user::users_by_ids(conn, context.caches.user.clone(), ids).await?)
+        Ok(repository::user::users_by_ids(conn, context.caches.user.clone(), ids).await?)
     }
 
     async fn groups(
@@ -49,7 +48,7 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(data::group::groups_by_ids(conn, context.caches.group.clone(), ids).await?)
+        Ok(repository::group::groups_by_ids(conn, context.caches.group.clone(), ids).await?)
     }
 
     async fn platform_roles(
@@ -59,7 +58,7 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(data::platform_role::platform_roles_by_ids(
+        Ok(repository::platform_role::platform_roles_by_ids(
             conn,
             context.caches.platform_role.clone(),
             ids,
@@ -76,6 +75,6 @@ impl Query {
 
         let cache = context.caches.group_role.clone();
 
-        Ok(data::group_role::group_roles_by_ids(conn, cache, ids).await?)
+        Ok(repository::group_role::group_roles_by_ids(conn, cache, ids).await?)
     }
 }

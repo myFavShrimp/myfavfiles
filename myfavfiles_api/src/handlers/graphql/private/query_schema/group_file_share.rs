@@ -5,7 +5,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "GroupFileShare")]
 impl entities::group_file_share::Entity {
@@ -31,7 +31,7 @@ impl entities::group_file_share::Entity {
 
         let cache = context.caches.group.clone();
 
-        Ok(data::group::group_by_id(db_connection, cache, self.id).await?)
+        Ok(repository::group::group_by_id(db_connection, cache, self.id).await?)
     }
 
     async fn user(&self, context: &Context) -> FieldResult<Option<Arc<entities::user::Entity>>> {
@@ -40,6 +40,6 @@ impl entities::group_file_share::Entity {
 
         let cache = context.caches.user.clone();
 
-        Ok(data::user::user_by_id(db_connection, cache, self.user_id).await?)
+        Ok(repository::user::user_by_id(db_connection, cache, self.user_id).await?)
     }
 }

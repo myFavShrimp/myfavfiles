@@ -9,6 +9,7 @@ pub mod entities;
 pub mod loaders;
 pub mod password;
 pub mod relation;
+pub mod repository;
 
 pub type DbPool = Pool<Postgres>;
 pub type PoolConnection = sqlx::pool::PoolConnection<Postgres>;

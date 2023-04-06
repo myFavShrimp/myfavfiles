@@ -4,7 +4,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "GroupRole")]
 impl entities::group_role::Entity {
@@ -32,7 +32,10 @@ impl entities::group_role::Entity {
 
         let cache = context.caches.group_member.clone();
 
-        Ok(data::group_member::group_memberships_by_group_role_id(conn, cache, self.id).await?)
+        Ok(
+            repository::group_member::group_memberships_by_group_role_id(conn, cache, self.id)
+                .await?,
+        )
     }
 
     async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
@@ -41,6 +44,6 @@ impl entities::group_role::Entity {
 
         let cache = context.caches.group.clone();
 
-        Ok(data::group::group_by_id(conn, cache, self.group_id).await?)
+        Ok(repository::group::group_by_id(conn, cache, self.group_id).await?)
     }
 }

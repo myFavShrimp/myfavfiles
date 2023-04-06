@@ -8,9 +8,8 @@ use crate::{
     AppState,
 };
 
-mod data;
-mod object;
 pub mod mutation_schema;
+mod object;
 pub mod query_schema;
 
 pub struct Context {

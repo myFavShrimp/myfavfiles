@@ -4,7 +4,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "User")]
 impl entities::user::Entity {
@@ -29,7 +29,7 @@ impl entities::user::Entity {
 
         let cache = context.caches.group_member.clone();
 
-        Ok(data::group_member::group_memberships_by_user_id(conn, cache, self.id).await?)
+        Ok(repository::group_member::group_memberships_by_user_id(conn, cache, self.id).await?)
     }
 
     async fn platform_roles(
@@ -40,7 +40,7 @@ impl entities::user::Entity {
 
         let cache = context.caches.platform_role.clone();
 
-        Ok(data::platform_role::platform_role_by_user_id(conn, cache, self.id).await?)
+        Ok(repository::platform_role::platform_role_by_user_id(conn, cache, self.id).await?)
     }
 
     async fn group_file_shares(
@@ -51,7 +51,10 @@ impl entities::user::Entity {
 
         let cache = context.caches.group_file_share.clone();
 
-        Ok(data::group_file_share::group_file_shares_by_user_id(conn, cache, self.id).await?)
+        Ok(
+            repository::group_file_share::group_file_shares_by_user_id(conn, cache, self.id)
+                .await?,
+        )
     }
 
     async fn file_shares(
@@ -62,6 +65,6 @@ impl entities::user::Entity {
 
         let cache = context.caches.user_file_share.clone();
 
-        Ok(data::user_file_share::user_file_shares_by_user_id(conn, cache, self.id).await?)
+        Ok(repository::user_file_share::user_file_shares_by_user_id(conn, cache, self.id).await?)
     }
 }

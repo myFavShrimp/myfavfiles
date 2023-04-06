@@ -5,7 +5,7 @@ use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
-use crate::{database::entities, handlers::graphql::private::data};
+use crate::database::{entities, repository};
 
 #[graphql_object(Context = Context, name = "UserFileShare")]
 impl entities::user_file_share::Entity {
@@ -27,6 +27,6 @@ impl entities::user_file_share::Entity {
 
         let cache = context.caches.user.clone();
 
-        Ok(data::user::user_by_id(conn, cache, self.user_id).await?)
+        Ok(repository::user::user_by_id(conn, cache, self.user_id).await?)
     }
 }
