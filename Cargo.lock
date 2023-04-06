@@ -968,7 +968,6 @@ dependencies = [
  "serde_json",
  "sqlx",
  "thiserror",
- "time 0.3.9",
  "tokio",
  "tower",
  "tracing",
