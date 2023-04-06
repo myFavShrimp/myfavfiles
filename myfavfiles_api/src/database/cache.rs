@@ -48,13 +48,7 @@ where
     }
 
     pub async fn all_cached(&self) -> Vec<Uuid> {
-        self.inner
-            .lock()
-            .await
-            .keys()
-            .into_iter()
-            .cloned()
-            .collect()
+        self.inner.lock().await.keys().cloned().collect()
     }
 
     pub async fn get_all(&self, ids: &[Uuid]) -> Vec<Arc<E>> {

@@ -46,7 +46,7 @@ where
         .await?
         .into_iter()
         .for_each(|item| {
-            let arc_item = Arc::new(item.clone());
+            let arc_item = Arc::new(item);
             cache_map.insert(arc_item.id(), arc_item.clone());
             results.push(arc_item);
         });
