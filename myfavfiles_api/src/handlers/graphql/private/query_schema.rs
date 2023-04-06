@@ -4,7 +4,10 @@ use juniper::FieldResult;
 use uuid::Uuid;
 
 use super::Context;
-use crate::database::{entities, loaders};
+use crate::{
+    database::{entities, loaders},
+    handlers::graphql::private::data,
+};
 
 mod group;
 mod group_file_share;
@@ -22,14 +25,11 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(loaders::cached::find_many_cached(
-            context.caches.user.clone(),
-            conn,
-            Some(vec![context.session_token.sub]),
+        Ok(
+            data::user::user_by_id(conn, context.caches.user.clone(), context.session_token.sub)
+                .await?
+                .unwrap(),
         )
-        .await?
-        .pop()
-        .unwrap())
     }
 
     async fn users(
@@ -39,7 +39,7 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(loaders::cached::find_many_cached(context.caches.user.clone(), conn, ids).await?)
+        Ok(data::user::users_by_ids(conn, context.caches.user.clone(), ids).await?)
     }
 
     async fn groups(
@@ -49,7 +49,7 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(loaders::cached::find_many_cached(context.caches.group.clone(), conn, ids).await?)
+        Ok(data::group::groups_by_ids(conn, context.caches.group.clone(), ids).await?)
     }
 
     async fn platform_roles(
@@ -59,10 +59,12 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(
-            loaders::cached::find_many_cached(context.caches.platform_role.clone(), conn, ids)
-                .await?,
+        Ok(data::platform_role::platform_roles_by_ids(
+            conn,
+            context.caches.platform_role.clone(),
+            ids,
         )
+        .await?)
     }
 
     async fn group_roles(
@@ -72,6 +74,8 @@ impl Query {
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
-        Ok(loaders::cached::find_many_cached(context.caches.group_role.clone(), conn, ids).await?)
+        let cache = context.caches.group_role.clone();
+
+        Ok(data::group_role::group_roles_by_ids(conn, cache, ids).await?)
     }
 }

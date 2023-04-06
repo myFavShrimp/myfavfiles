@@ -18,6 +18,14 @@ pub async fn group_by_id(
     )
 }
 
+pub async fn groups_by_ids(
+    db_connection: &mut PoolConnection,
+    cache: Cache<entities::group::Entity>,
+    group_ids: Option<Vec<Uuid>>,
+) -> Result<Vec<Arc<entities::group::Entity>>, DataError> {
+    Ok(loaders::cached::find_many_cached(cache, db_connection, group_ids).await?)
+}
+
 // pub async fn create_group(
 //     db_connection: &mut PoolConnection,
 //     cache: Cache<entities::group::Entity>,

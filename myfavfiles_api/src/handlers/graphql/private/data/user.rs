@@ -18,6 +18,14 @@ pub async fn user_by_id(
     )
 }
 
+pub async fn users_by_ids(
+    db_connection: &mut PoolConnection,
+    cache: Cache<entities::user::Entity>,
+    user_ids: Option<Vec<Uuid>>,
+) -> Result<Vec<Arc<entities::user::Entity>>, DataError> {
+    Ok(loaders::cached::find_many_cached(cache, db_connection, user_ids).await?)
+}
+
 pub async fn user_by_platform_role_id(
     db_connection: &mut PoolConnection,
     cache: Cache<entities::user::Entity>,
