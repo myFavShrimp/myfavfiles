@@ -12,7 +12,7 @@ use axum::{
 };
 use tokio::sync::Mutex;
 
-use crate::{auth::AuthStatus, database::cache::Caches, AppState};
+use crate::{auth::AuthStatus, database::Caches, AppState};
 
 pub use {private::create_root as create_private_root, private::Root as PrivateRoot};
 pub use {public::create_root as create_public_root, public::Root as PublicRoot};

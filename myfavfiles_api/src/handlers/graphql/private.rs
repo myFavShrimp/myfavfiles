@@ -4,7 +4,7 @@ use tokio::sync::Mutex;
 
 use crate::{
     auth::token::Token,
-    database::{cache::Caches, PoolConnection},
+    database::{Caches, PoolConnection},
     AppState,
 };
 
