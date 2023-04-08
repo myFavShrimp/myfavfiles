@@ -1,13 +1,12 @@
-use self::token::Token;
-
 use std::convert::Infallible;
 
-use async_trait::async_trait;
+use self::token::Token;
+
 use axum::{
-    body::BoxBody,
-    extract::FromRequest,
-    http::{self, Request},
+    extract::FromRequestParts,
+    http::{self, request::Parts},
 };
+use chrono::Local;
 use myfavfiles_common::config::Config;
 
 pub mod token;
@@ -19,15 +18,14 @@ pub enum AuthStatus {
     Ok(Token),
 }
 
-#[async_trait]
-impl<S> FromRequest<S, BoxBody> for AuthStatus
+#[async_trait::async_trait]
+impl<S> FromRequestParts<S> for AuthStatus
 where
     S: Send + Sync,
 {
     type Rejection = Infallible;
 
-    async fn from_request(req: Request<BoxBody>, state: &S) -> Result<Self, Self::Rejection> {
-        use chrono::Local;
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
         if let Some(id) = Config::default().force_session {
             return Ok(Self::Ok(Token {
                 sub: id,
@@ -36,8 +34,8 @@ where
             }));
         }
 
-        let token_maybe = req
-            .headers()
+        let token_maybe = parts
+            .headers
             .get(http::header::AUTHORIZATION)
             .and_then(|val| val.to_str().ok());
 

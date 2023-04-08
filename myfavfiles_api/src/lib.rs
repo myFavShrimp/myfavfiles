@@ -1,10 +1,6 @@
-use axum::{
-    routing::{get, post},
-    Extension, Router,
-};
+use axum::{routing::get, Router};
 use myfavfiles_common::config::Config;
 use std::sync::Arc;
-use tower::ServiceBuilder;
 
 #[macro_use]
 pub mod database;

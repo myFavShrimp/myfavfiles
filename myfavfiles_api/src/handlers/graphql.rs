@@ -8,9 +8,7 @@ use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
-    headers::{self, authorization::Bearer},
     response::{Html, IntoResponse},
-    TypedHeader,
 };
 use tokio::sync::Mutex;
 
@@ -27,7 +25,7 @@ pub async fn playground() -> impl IntoResponse {
 
 pub async fn graphql(
     State(ref state): State<Arc<AppState>>,
-    TypedHeader(_authorization): TypedHeader<headers::Authorization<Bearer>>,
+    auth_header: AuthStatus,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
     let database_connection = match state
@@ -39,9 +37,7 @@ pub async fn graphql(
         Err(e) => return e,
     };
 
-    let auth_status = AuthStatus::Missing;
-
-    match auth_status {
+    match auth_header {
         AuthStatus::Ok(auth_token) => {
             let context = private::Context {
                 app_state: state.clone(),
@@ -55,7 +51,6 @@ pub async fn graphql(
                 .execute(req.into_inner().data(context))
                 .await
                 .into()
-            // juniper_hyper::graphql(state.graphql_root_authenticated.clone(), context, req).await
         }
         _unauthorised => {
             let context = public::Context {
@@ -68,7 +63,6 @@ pub async fn graphql(
                 .execute(req.into_inner().data(context))
                 .await
                 .into()
-            // juniper_hyper::graphql(state.graphql_root_unauthorised.clone(), context, req).await
         }
     }
 }
