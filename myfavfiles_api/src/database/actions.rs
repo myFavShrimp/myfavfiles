@@ -1,4 +1,4 @@
-use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr, Value, Values};
+use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr, Value};
 use sea_query_binder::{SqlxBinder, SqlxValues};
 use uuid::Uuid;
 
