@@ -59,9 +59,6 @@ version = "0.28"
 [dependencies.chrono]
 version = "0"
 features = ["serde"]
-[dev-dependencies.chrono]
-version = "0"
-features = ["serde"]
 
 [dependencies.sqlx]
 version = "0.6"
