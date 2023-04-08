@@ -1,4 +1,3 @@
-use juniper::GraphQLEnum;
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
@@ -51,9 +50,8 @@ impl super::TableEntity for Entity {
     }
 }
 
-#[derive(Copy, Clone, Debug, sqlx::Type, GraphQLEnum)]
+#[derive(Copy, Clone, Debug, sqlx::Type, async_graphql::Enum, Eq, PartialEq)]
 #[sqlx(type_name = "group_permissions_enum", rename_all = "snake_case")]
-
 pub enum GroupRolePermission {
     CreateInviteCode,
     KickUser,

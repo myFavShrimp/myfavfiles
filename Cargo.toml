@@ -7,9 +7,12 @@ members = [
 ]
 
 [workspace.dependencies]
-axum = "0.5.16"
+axum = "0.6"
 
 [workspace.dependencies.tokio]
 version = "1.18.5"
 features = ["full"]
 
+[workspace.dependencies.uuid]
+version = "1"
+features = ["serde"]

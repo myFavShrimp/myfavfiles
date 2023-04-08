@@ -4,8 +4,9 @@ use std::convert::Infallible;
 
 use async_trait::async_trait;
 use axum::{
-    extract::{FromRequest, RequestParts},
-    http,
+    body::BoxBody,
+    extract::FromRequest,
+    http::{self, Request},
 };
 use myfavfiles_common::config::Config;
 
@@ -19,13 +20,13 @@ pub enum AuthStatus {
 }
 
 #[async_trait]
-impl<B> FromRequest<B> for AuthStatus
+impl<S> FromRequest<S, BoxBody> for AuthStatus
 where
-    B: Send,
+    S: Send + Sync,
 {
     type Rejection = Infallible;
 
-    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+    async fn from_request(req: Request<BoxBody>, state: &S) -> Result<Self, Self::Rejection> {
         use chrono::Local;
         if let Some(id) = Config::default().force_session {
             return Ok(Self::Ok(Token {

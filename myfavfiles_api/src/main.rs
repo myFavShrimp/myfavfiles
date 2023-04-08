@@ -9,7 +9,7 @@ async fn main() {
 
     let app = api::create_api_router(config)
         .await
-        .fallback(common::handler::handler_404.into_service());
+        .fallback(common::handler::handler_404);
     let address = common::config::Config::default().address();
 
     axum::Server::bind(&address)

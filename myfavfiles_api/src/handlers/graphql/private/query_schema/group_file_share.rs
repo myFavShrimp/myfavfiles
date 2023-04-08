@@ -1,13 +1,12 @@
 use std::{ops::DerefMut, sync::Arc};
 
 use chrono::NaiveDateTime;
-use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
 use crate::database::{entities, repository};
 
-#[graphql_object(Context = Context, name = "GroupFileShare")]
+#[async_graphql::Object(name = "GroupFileShare")]
 impl entities::group_file_share::Entity {
     async fn id(&self) -> Uuid {
         self.id
@@ -25,7 +24,11 @@ impl entities::group_file_share::Entity {
         self.expiration
     }
 
-    async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
+    async fn group<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Option<Arc<entities::group::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let db_connection = lock.deref_mut();
 
@@ -34,7 +37,11 @@ impl entities::group_file_share::Entity {
         Ok(repository::group::group_by_id(db_connection, cache, self.id).await?)
     }
 
-    async fn user(&self, context: &Context) -> FieldResult<Option<Arc<entities::user::Entity>>> {
+    async fn user<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Option<Arc<entities::user::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let db_connection = lock.deref_mut();
 

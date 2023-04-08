@@ -1,13 +1,12 @@
 use std::{ops::DerefMut, sync::Arc};
 
 use chrono::NaiveDateTime;
-use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
 use crate::database::{entities, repository};
 
-#[graphql_object(Context = Context, name = "UserFileShare")]
+#[async_graphql::Object(name = "UserFileShare")]
 impl entities::user_file_share::Entity {
     async fn id(&self) -> Uuid {
         self.id
@@ -21,7 +20,11 @@ impl entities::user_file_share::Entity {
         self.expiration
     }
 
-    async fn user(context: &Context) -> FieldResult<Option<Arc<entities::user::Entity>>> {
+    async fn user<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Option<Arc<entities::user::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 

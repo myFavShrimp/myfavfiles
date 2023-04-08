@@ -1,12 +1,11 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
 use crate::database::{entities, repository};
 
-#[graphql_object(Context = Context, name = "GroupRole")]
+#[async_graphql::Object(name = "GroupRole")]
 impl entities::group_role::Entity {
     async fn id(&self) -> Uuid {
         self.id
@@ -24,9 +23,11 @@ impl entities::group_role::Entity {
         self.permissions.clone()
     }
 
-    async fn group_members(
-        context: &Context,
-    ) -> FieldResult<Vec<Arc<entities::group_member::Entity>>> {
+    async fn group_members<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Vec<Arc<entities::group_member::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -38,7 +39,11 @@ impl entities::group_role::Entity {
         )
     }
 
-    async fn group(&self, context: &Context) -> FieldResult<Option<Arc<entities::group::Entity>>> {
+    async fn group<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Option<Arc<entities::group::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 

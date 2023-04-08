@@ -1,12 +1,15 @@
-use juniper::FieldResult;
-
 use super::{object::group::GroupCreaionInput, Context};
 
 pub struct Mutation;
 
-#[juniper::graphql_object(context = Context)]
+#[async_graphql::Object]
 impl Mutation {
-    async fn create_group(context: &Context, group: GroupCreaionInput) -> FieldResult<String> {
+    async fn create_group<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+        group: GroupCreaionInput,
+    ) -> async_graphql::Result<String> {
+        let context = context.data::<Context>()?;
         let current_user = context.session_token.sub;
 
         println!(

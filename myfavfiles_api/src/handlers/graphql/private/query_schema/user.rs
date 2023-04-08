@@ -1,12 +1,11 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::{graphql_object, FieldResult};
 use uuid::Uuid;
 
 use super::super::Context;
 use crate::database::{entities, repository};
 
-#[graphql_object(Context = Context, name = "User")]
+#[async_graphql::Object(name = "User")]
 impl entities::user::Entity {
     async fn id(&self) -> Uuid {
         self.id
@@ -20,10 +19,11 @@ impl entities::user::Entity {
         self.is_admin
     }
 
-    async fn group_memberships(
+    async fn group_memberships<'context>(
         &self,
-        context: &Context,
-    ) -> FieldResult<Vec<Arc<entities::group_member::Entity>>> {
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Vec<Arc<entities::group_member::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -32,9 +32,11 @@ impl entities::user::Entity {
         Ok(repository::group_member::group_memberships_by_user_id(conn, cache, self.id).await?)
     }
 
-    async fn platform_roles(
-        context: &Context,
-    ) -> FieldResult<Vec<Arc<entities::platform_role::Entity>>> {
+    async fn platform_roles<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Vec<Arc<entities::platform_role::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -43,9 +45,11 @@ impl entities::user::Entity {
         Ok(repository::platform_role::platform_role_by_user_id(conn, cache, self.id).await?)
     }
 
-    async fn group_file_shares(
-        context: &Context,
-    ) -> FieldResult<Vec<Arc<entities::group_file_share::Entity>>> {
+    async fn group_file_shares<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Vec<Arc<entities::group_file_share::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -57,9 +61,11 @@ impl entities::user::Entity {
         )
     }
 
-    async fn file_shares(
-        context: &Context,
-    ) -> FieldResult<Vec<Arc<entities::user_file_share::Entity>>> {
+    async fn file_shares<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Vec<Arc<entities::user_file_share::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 

@@ -1,4 +1,7 @@
-use sea_query::{Iden, Values};
+use sea_query::{
+    ColumnDef, Expr, Func, Iden, OnConflict, Order, PostgresQueryBuilder, Query, Table, Values,
+};
+use sea_query_binder::{SqlxBinder, SqlxValues};
 use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
@@ -6,7 +9,7 @@ use std::fmt::Debug;
 
 use crate::database::{
     actions::build_select_query,
-    driver::bind_query_as,
+    // driver::bind_query_as,
     entities::{id_entity::IdEntity, Identifiable, TableEntity},
     relation::{ManyToManyRelation, OneToXRelation},
     PoolConnection,
@@ -17,12 +20,12 @@ use super::LoaderError;
 pub async fn query<E>(
     conn: &mut PoolConnection,
     sql: String,
-    values: Values,
+    values: SqlxValues,
 ) -> Result<Vec<E>, LoaderError>
 where
     E: Clone + for<'r> FromRow<'r, PgRow> + Send + Unpin + Sync + TableEntity + Debug,
 {
-    let query = bind_query_as(sqlx::query_as::<_, E>(&sql), &values);
+    let query = sqlx::query_as_with::<_, E, _>(&sql, values);
     match query.fetch_all(conn).await {
         Ok(rows) => Ok(rows.iter().fold(Vec::new(), |mut acc, item| {
             acc.push(item.clone());
@@ -36,7 +39,7 @@ where
 pub async fn query_ids(
     conn: &mut PoolConnection,
     sql: String,
-    values: Values,
+    values: SqlxValues,
 ) -> Result<Vec<IdEntity>, LoaderError> {
     query(conn, sql, values).await
 }

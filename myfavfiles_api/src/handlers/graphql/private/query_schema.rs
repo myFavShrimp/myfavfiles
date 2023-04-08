@@ -1,6 +1,5 @@
 use std::{ops::DerefMut, sync::Arc};
 
-use juniper::FieldResult;
 use uuid::Uuid;
 
 use super::Context;
@@ -16,9 +15,13 @@ mod user_file_share;
 
 pub struct Query;
 
-#[juniper::graphql_object(context = Context)]
+#[async_graphql::Object]
 impl Query {
-    async fn me(context: &Context) -> FieldResult<Arc<entities::user::Entity>> {
+    async fn me<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
+    ) -> async_graphql::Result<Arc<entities::user::Entity>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -31,30 +34,36 @@ impl Query {
         .unwrap())
     }
 
-    async fn users(
-        context: &Context,
+    async fn users<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
         ids: Option<Vec<Uuid>>,
-    ) -> FieldResult<Vec<Arc<entities::user::Entity>>> {
+    ) -> async_graphql::Result<Vec<Arc<entities::user::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         Ok(repository::user::users_by_ids(conn, context.caches.user.clone(), ids).await?)
     }
 
-    async fn groups(
-        context: &Context,
+    async fn groups<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
         ids: Option<Vec<Uuid>>,
-    ) -> FieldResult<Vec<Arc<entities::group::Entity>>> {
+    ) -> async_graphql::Result<Vec<Arc<entities::group::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
         Ok(repository::group::groups_by_ids(conn, context.caches.group.clone(), ids).await?)
     }
 
-    async fn platform_roles(
-        context: &Context,
+    async fn platform_roles<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
         ids: Option<Vec<Uuid>>,
-    ) -> FieldResult<Vec<Arc<entities::platform_role::Entity>>> {
+    ) -> async_graphql::Result<Vec<Arc<entities::platform_role::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 
@@ -66,10 +75,12 @@ impl Query {
         .await?)
     }
 
-    async fn group_roles(
-        context: &Context,
+    async fn group_roles<'context>(
+        &self,
+        context: &async_graphql::Context<'context>,
         ids: Option<Vec<Uuid>>,
-    ) -> FieldResult<Vec<Arc<entities::group_role::Entity>>> {
+    ) -> async_graphql::Result<Vec<Arc<entities::group_role::Entity>>> {
+        let context = context.data::<Context>()?;
         let mut lock = context.database_connection.lock().await;
         let conn = lock.deref_mut();
 

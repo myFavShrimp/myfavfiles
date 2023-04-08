@@ -1,4 +1,5 @@
-use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, Value, Values};
+use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr, Value, Values};
+use sea_query_binder::{SqlxBinder, SqlxValues};
 use uuid::Uuid;
 
 pub fn build_select_query<ColumnsEnum, IdType>(
@@ -6,7 +7,7 @@ pub fn build_select_query<ColumnsEnum, IdType>(
     table: ColumnsEnum,
     id_column: ColumnsEnum,
     ids_to_load: Option<Vec<IdType>>,
-) -> (String, Values)
+) -> (String, SqlxValues)
 where
     ColumnsEnum: Iden + 'static,
     IdType: Into<Value>,
@@ -16,19 +17,19 @@ where
             .columns(columns)
             .from(table)
             .and_where(Expr::col(id_column).is_in(ids_to_load))
-            .build(PostgresQueryBuilder),
+            .build_sqlx(PostgresQueryBuilder),
         None => Query::select()
             .columns(columns)
             .from(table)
-            .build(PostgresQueryBuilder),
+            .build_sqlx(PostgresQueryBuilder),
     }
 }
 
 pub fn build_insert_query<ColumnsEnum>(
     table: ColumnsEnum,
     columns: Vec<ColumnsEnum>,
-    values: Vec<Value>,
-) -> (String, Values)
+    values: Vec<SimpleExpr>,
+) -> (String, SqlxValues)
 where
     ColumnsEnum: Iden + 'static,
 {
@@ -38,15 +39,15 @@ where
         .values(values)
         .unwrap()
         .returning_all()
-        .build(PostgresQueryBuilder)
+        .build_sqlx(PostgresQueryBuilder)
 }
 
 pub fn build_update_query<ColumnsEnum>(
     table: ColumnsEnum,
-    values: Vec<(ColumnsEnum, Value)>,
+    values: Vec<(ColumnsEnum, SimpleExpr)>,
     id_column: ColumnsEnum,
     id: Uuid,
-) -> (String, Values)
+) -> (String, SqlxValues)
 where
     ColumnsEnum: Iden + 'static,
 {
@@ -55,5 +56,5 @@ where
         .values(values)
         .and_where(Expr::col(id_column).eq(id))
         .returning_all()
-        .build(PostgresQueryBuilder)
+        .build_sqlx(PostgresQueryBuilder)
 }
