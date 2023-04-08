@@ -42,7 +42,5 @@ pub async fn create_api_router(config: Config) -> Router {
             "/graphql",
             get(handlers::graphql::playground).post(handlers::graphql::graphql),
         )
-        // .route("/playground")
-        // .layer(ServiceBuilder::new().layer(Extension(app_state)))
         .with_state(app_state)
 }

@@ -9,7 +9,7 @@ use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
     headers::{self, authorization::Bearer},
-    response::IntoResponse,
+    response::{Html, IntoResponse},
     TypedHeader,
 };
 use tokio::sync::Mutex;
@@ -20,7 +20,9 @@ pub use {private::create_root as create_private_root, private::Root as PrivateRo
 pub use {public::create_root as create_public_root, public::Root as PublicRoot};
 
 pub async fn playground() -> impl IntoResponse {
-    playground_source(GraphQLPlaygroundConfig::new("/api/graphql"));
+    Html(playground_source(GraphQLPlaygroundConfig::new(
+        "/api/graphql",
+    )))
 }
 
 pub async fn graphql(
