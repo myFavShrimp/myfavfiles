@@ -1,12 +1,14 @@
+use mini_orm::{
+    entity::{Identifiable, TableEntity},
+    macros::iden,
+    relation::ManyToManyRelation,
+};
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
-use crate::database::{
-    entities::{self, Identifiable},
-    relation::ManyToManyRelation,
-};
+use crate::database::entities;
 
-columns! {
+iden! {
     Table => "platform_role",
     Id => "id",
     Name => "name",
@@ -22,24 +24,26 @@ pub struct Entity {
 }
 
 impl Identifiable for Entity {
+    type IdType = Uuid;
+
     fn id(&self) -> Uuid {
         self.id
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
+    fn id_column() -> Iden {
+        Iden::Id
     }
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![Columns::Id, Columns::Name, Columns::Permissions]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::Id, Iden::Name, Iden::Permissions]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }
 
@@ -64,9 +68,8 @@ impl PgHasArrayType for PlatformRolePermission {
 }
 
 impl ManyToManyRelation<entities::user::Entity, entities::user_role::Entity> for Entity {
-    fn own_relation_id_column(
-    ) -> <entities::user_role::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::user_role::Columns::PlatformRoleId
+    fn own_relation_id_column() -> <entities::user_role::Entity as TableEntity>::Iden {
+        entities::user_role::Iden::PlatformRoleId
     }
 
     fn other_entity_id(entity: entities::user_role::Entity) -> Uuid {

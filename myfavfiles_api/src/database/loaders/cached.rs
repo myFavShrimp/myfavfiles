@@ -1,14 +1,11 @@
 use std::{fmt::Debug, sync::Arc};
 
+use mini_orm::entity::{Identifiable, TableEntity};
 use sea_query::Iden;
 use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
-use crate::database::{
-    cache::Cache,
-    entities::{Identifiable, TableEntity},
-    PoolConnection,
-};
+use crate::database::{cache::Cache, PoolConnection};
 
 use super::{cacheless::find_many, LoaderError};
 
@@ -22,12 +19,11 @@ where
         + for<'r> FromRow<'r, PgRow>
         + Send
         + Unpin
-        + Identifiable
+        + Identifiable<IdType = Uuid>
         + Sync
         + TableEntity
-        + Identifiable
         + Debug,
-    <E as TableEntity>::ColumnsEnum: Iden + Send + 'static,
+    <E as TableEntity>::Iden: Iden + Send + 'static,
     sea_query::Value: From<Uuid>,
 {
     let cached_ids = cache.all_cached().await;

@@ -1,16 +1,13 @@
 use std::{ops::DerefMut, sync::Arc};
 
 use axum::http::StatusCode;
+use mini_orm::entity::TableEntity;
 use sea_query::{Expr, PostgresQueryBuilder, Query};
 use sea_query_binder::SqlxBinder;
 
 use crate::{
     auth::token::Token,
-    database::{
-        actions,
-        entities::{self, TableEntity},
-        password,
-    },
+    database::{actions, entities, password},
     handlers::graphql::public::Context,
 };
 
@@ -26,8 +23,8 @@ pub async fn perform_login(
 
     let (sql, values) = Query::select()
         .columns(entities::user::Entity::all_columns())
-        .from(entities::user::Columns::Table)
-        .and_where(Expr::col(entities::user::Columns::Name).eq(username))
+        .from(entities::user::Iden::Table)
+        .and_where(Expr::col(entities::user::Iden::Name).eq(username))
         .build_sqlx(PostgresQueryBuilder);
 
     let mut mutex = ctx.database_connection.lock().await;
@@ -50,9 +47,9 @@ pub async fn perform_login(
         ctx.app_state.config.bcrypt_cost,
     ) {
         let (sql, values) = actions::build_update_query(
-            entities::user::Columns::Table,
-            vec![(entities::user::Columns::Password, new_hash.into())],
-            entities::user::Columns::Id,
+            entities::user::Iden::Table,
+            vec![(entities::user::Iden::Password, new_hash.into())],
+            entities::user::Iden::Id,
             user.id,
         );
 
@@ -91,11 +88,8 @@ pub async fn perform_registration(
     let values = vec![username.into(), password.into()];
 
     let (sql, values) = actions::build_insert_query(
-        entities::user::Columns::Table,
-        vec![
-            entities::user::Columns::Name,
-            entities::user::Columns::Password,
-        ],
+        entities::user::Iden::Table,
+        vec![entities::user::Iden::Name, entities::user::Iden::Password],
         values,
     );
 

@@ -1,9 +1,11 @@
 use chrono::NaiveDateTime;
+use mini_orm::{
+    entity::{Identifiable, TableEntity},
+    macros::iden,
+};
 use uuid::Uuid;
 
-use crate::database::entities::Identifiable;
-
-columns! {
+iden! {
     Table => "user_file_share",
     Id => "id",
     UserId => "user_id",
@@ -19,23 +21,25 @@ pub struct Entity {
 }
 
 impl Identifiable for Entity {
+    type IdType = Uuid;
+
     fn id(&self) -> Uuid {
         self.id
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
+    fn id_column() -> Iden {
+        Iden::Id
     }
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![Columns::Id, Columns::UserId, Columns::Expiration]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::Id, Iden::UserId, Iden::Expiration]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }

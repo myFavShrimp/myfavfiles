@@ -1,5 +1,3 @@
-use uuid::Uuid;
-
 pub mod group;
 pub mod group_file_share;
 pub mod group_member;
@@ -10,54 +8,51 @@ pub mod user;
 pub mod user_file_share;
 pub mod user_role;
 
-pub trait Identifiable: TableEntity {
-    fn id(&self) -> Uuid;
-
-    fn id_column() -> Self::ColumnsEnum;
-}
-
-pub trait TableEntity {
-    type ColumnsEnum;
-
-    fn all_columns() -> Vec<Self::ColumnsEnum>;
-
-    fn table() -> Self::ColumnsEnum;
-}
-
 pub mod id_entity {
-    use uuid::Uuid;
+    use mini_orm::{
+        entity::{Identifiable, TableEntity},
+        macros::iden,
+    };
 
-    use super::{Identifiable, TableEntity};
-
-    columns! {
+    iden! {
         Id => "id",
     }
 
-    #[derive(sqlx::FromRow, Debug, Clone)]
-    #[allow(dead_code)]
-    pub struct IdEntity {
-        pub id: Uuid,
+    #[derive(Debug, Clone, sqlx::FromRow)]
+    pub struct IdEntity<I>
+    where
+        I: Copy + Send + Sync,
+    {
+        pub id: I,
     }
 
-    impl TableEntity for IdEntity {
-        type ColumnsEnum = Columns;
+    impl<I> TableEntity for IdEntity<I>
+    where
+        I: Copy + Send + Sync,
+    {
+        type Iden = Iden;
 
-        fn all_columns() -> Vec<Self::ColumnsEnum> {
-            vec![Columns::Id]
+        fn all_columns() -> Vec<Self::Iden> {
+            vec![Iden::Id]
         }
 
-        fn table() -> Self::ColumnsEnum {
+        fn table() -> Self::Iden {
             panic!("IdEntity does not have a table")
         }
     }
 
-    impl Identifiable for IdEntity {
-        fn id(&self) -> Uuid {
+    impl<I> Identifiable for IdEntity<I>
+    where
+        I: Copy + Send + Sync,
+    {
+        type IdType = I;
+
+        fn id(&self) -> I {
             self.id
         }
 
-        fn id_column() -> Self::ColumnsEnum {
-            Columns::Id
+        fn id_column() -> Self::Iden {
+            Iden::Id
         }
     }
 }

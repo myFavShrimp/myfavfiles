@@ -1,11 +1,13 @@
-use uuid::Uuid;
-
-use crate::database::{
-    entities::{self, Identifiable},
+use mini_orm::{
+    entity::{Identifiable, TableEntity},
+    macros::iden,
     relation::{ManyToManyRelation, OneToXRelation},
 };
+use uuid::Uuid;
 
-columns! {
+use crate::database::entities;
+
+iden! {
     Table => "user",
     Id => "id",
     Name => "name",
@@ -23,57 +25,50 @@ pub struct Entity {
 }
 
 impl Identifiable for Entity {
+    type IdType = Uuid;
+
     fn id(&self) -> Uuid {
         self.id
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
+    fn id_column() -> Iden {
+        Iden::Id
     }
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![
-            Columns::Id,
-            Columns::Name,
-            Columns::Password,
-            Columns::IsAdmin,
-        ]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::Id, Iden::Name, Iden::Password, Iden::IsAdmin]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }
 
 impl OneToXRelation<entities::group_member::Entity> for Entity {
-    fn target_relation_id_column(
-    ) -> <entities::group_member::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::group_member::Columns::UserId
+    fn target_relation_id_column() -> <entities::group_member::Entity as TableEntity>::Iden {
+        entities::group_member::Iden::UserId
     }
 }
 
 impl OneToXRelation<entities::group_file_share::Entity> for Entity {
-    fn target_relation_id_column(
-    ) -> <entities::group_file_share::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::group_file_share::Columns::UserId
+    fn target_relation_id_column() -> <entities::group_file_share::Entity as TableEntity>::Iden {
+        entities::group_file_share::Iden::UserId
     }
 }
 
 impl OneToXRelation<entities::user_file_share::Entity> for Entity {
-    fn target_relation_id_column(
-    ) -> <entities::user_file_share::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::user_file_share::Columns::UserId
+    fn target_relation_id_column() -> <entities::user_file_share::Entity as TableEntity>::Iden {
+        entities::user_file_share::Iden::UserId
     }
 }
 
 impl ManyToManyRelation<entities::platform_role::Entity, entities::user_role::Entity> for Entity {
-    fn own_relation_id_column(
-    ) -> <entities::user_role::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::user_role::Columns::UserId
+    fn own_relation_id_column() -> <entities::user_role::Entity as TableEntity>::Iden {
+        entities::user_role::Iden::UserId
     }
 
     fn other_entity_id(entity: entities::user_role::Entity) -> Uuid {

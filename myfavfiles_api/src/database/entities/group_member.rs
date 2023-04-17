@@ -1,11 +1,13 @@
-use uuid::Uuid;
-
-use crate::database::{
-    entities::{self, Identifiable},
+use mini_orm::{
+    entity::{Identifiable, TableEntity},
+    macros::iden,
     relation::ManyToManyRelation,
 };
+use uuid::Uuid;
 
-columns! {
+use crate::database::entities;
+
+iden! {
     Table => "group_member",
     Id => "id",
     UserId => "user_id",
@@ -23,38 +25,34 @@ pub struct Entity {
 }
 
 impl Identifiable for Entity {
+    type IdType = Uuid;
+
     fn id(&self) -> Uuid {
         self.id
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
+    fn id_column() -> Iden {
+        Iden::Id
     }
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![
-            Columns::Id,
-            Columns::UserId,
-            Columns::GroupId,
-            Columns::IsAdmin,
-        ]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::Id, Iden::UserId, Iden::GroupId, Iden::IsAdmin]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }
 
 impl ManyToManyRelation<entities::group_role::Entity, entities::group_member_role::Entity>
     for Entity
 {
-    fn own_relation_id_column(
-    ) -> <entities::group_member_role::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::group_member_role::Columns::GroupMemberId
+    fn own_relation_id_column() -> <entities::group_member_role::Entity as TableEntity>::Iden {
+        entities::group_member_role::Iden::GroupMemberId
     }
 
     fn other_entity_id(entity: entities::group_member_role::Entity) -> Uuid {

@@ -29,6 +29,10 @@ sea-query-binder = { version = "0.3", features = [
     "with-mac_address",
 ] }
 
+[dependencies.mini-orm]
+git = "https://github.com/myFavShrimp/mini-orm.git"
+rev = "97757fb994652592a9176110d92b299e2527fe0b"
+
 [dependencies.async-graphql]
 version = "5.0"
 features = [

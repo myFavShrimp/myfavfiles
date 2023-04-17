@@ -1309,6 +1309,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "mini-orm"
+version = "0.1.0"
+source = "git+https://github.com/myFavShrimp/mini-orm.git?rev=97757fb994652592a9176110d92b299e2527fe0b#97757fb994652592a9176110d92b299e2527fe0b"
+dependencies = [
+ "mini-orm-macro",
+ "sea-query",
+]
+
+[[package]]
+name = "mini-orm-macro"
+version = "0.1.0"
+source = "git+https://github.com/myFavShrimp/mini-orm.git?rev=97757fb994652592a9176110d92b299e2527fe0b#97757fb994652592a9176110d92b299e2527fe0b"
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1368,6 +1382,7 @@ dependencies = [
  "envy",
  "hyper",
  "jsonwebtoken",
+ "mini-orm",
  "myfavfiles_common",
  "sea-query",
  "sea-query-binder",

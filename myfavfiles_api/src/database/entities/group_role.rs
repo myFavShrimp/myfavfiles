@@ -1,12 +1,14 @@
+use mini_orm::{
+    entity::{Identifiable, TableEntity},
+    macros::iden,
+    relation::ManyToManyRelation,
+};
 use sqlx::postgres::PgHasArrayType;
 use uuid::Uuid;
 
-use crate::database::{
-    entities::{self, Identifiable},
-    relation::ManyToManyRelation,
-};
+use crate::database::entities;
 
-columns! {
+iden! {
     Table => "group_role",
     Id => "id",
     Name => "name",
@@ -24,29 +26,26 @@ pub struct Entity {
 }
 
 impl Identifiable for Entity {
+    type IdType = Uuid;
+
     fn id(&self) -> Uuid {
         self.id
     }
 
-    fn id_column() -> Columns {
-        Columns::Id
+    fn id_column() -> Iden {
+        Iden::Id
     }
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![
-            Columns::Id,
-            Columns::Name,
-            Columns::GroupId,
-            Columns::Permissions,
-        ]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::Id, Iden::Name, Iden::GroupId, Iden::Permissions]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }
 
@@ -70,9 +69,8 @@ impl PgHasArrayType for GroupRolePermission {
 impl ManyToManyRelation<entities::group_member::Entity, entities::group_member_role::Entity>
     for Entity
 {
-    fn own_relation_id_column(
-    ) -> <entities::group_member_role::Entity as entities::TableEntity>::ColumnsEnum {
-        entities::group_member_role::Columns::GroupRoleId
+    fn own_relation_id_column() -> <entities::group_member_role::Entity as TableEntity>::Iden {
+        entities::group_member_role::Iden::GroupRoleId
     }
 
     fn other_entity_id(entity: entities::group_member_role::Entity) -> Uuid {

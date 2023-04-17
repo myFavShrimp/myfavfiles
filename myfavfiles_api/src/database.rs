@@ -1,14 +1,11 @@
 use sqlx::{migrate::MigrateDatabase, PgPool, Pool, Postgres};
 
-#[macro_use]
-mod macros;
 pub mod actions;
 mod cache;
-// pub mod driver; // make private
 pub mod entities;
 pub mod loaders;
 pub mod password;
-pub mod relation; // make private
+// pub mod relation; // make private
 pub mod repository;
 
 pub use cache::Caches;

@@ -1,6 +1,7 @@
+use mini_orm::{entity::TableEntity, macros::iden};
 use uuid::Uuid;
 
-columns! {
+iden! {
     Table => "group_member_role",
     GroupMemberId => "group_member_id",
     GroupRoleId => "group_role_id",
@@ -13,14 +14,14 @@ pub struct Entity {
     pub group_role_id: Uuid,
 }
 
-impl super::TableEntity for Entity {
-    type ColumnsEnum = Columns;
+impl TableEntity for Entity {
+    type Iden = Iden;
 
-    fn all_columns() -> Vec<Columns> {
-        vec![Columns::GroupMemberId, Columns::GroupRoleId]
+    fn all_columns() -> Vec<Iden> {
+        vec![Iden::GroupMemberId, Iden::GroupRoleId]
     }
 
-    fn table() -> Columns {
-        Columns::Table
+    fn table() -> Iden {
+        Iden::Table
     }
 }
