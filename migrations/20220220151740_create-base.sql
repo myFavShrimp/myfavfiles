@@ -23,14 +23,14 @@ CREATE TABLE "group_member" (
     "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
     "user_id" UUID NOT NULL,
     "group_id" UUID NOT NULL,
-    "is_admin" BOOLEAN DEFAULT false NOT NULL,
-    "permissions" public."_group_permissions_enum"
+    "is_admin" BOOLEAN DEFAULT false NOT NULL
 );
 
 CREATE TABLE "group_role" (
     "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
     "name" VARCHAR(255) NOT NULL,
-    "group_id" UUID NOT NULL
+    "group_id" UUID NOT NULL,
+    "permissions" public."_group_permissions_enum"
 );
 
 CREATE TABLE "group_member_role" (
