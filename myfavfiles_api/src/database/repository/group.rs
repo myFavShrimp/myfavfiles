@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use sqlx::Acquire;
 use uuid::Uuid;
 
 use crate::database::{
@@ -45,8 +46,25 @@ pub async fn create_group(
         )?;
 
         let query = sqlx::query_as_with::<_, entities::group::Entity, _>(&sql, values);
-        query.fetch_one(db_connection).await?
+        let conn = db_connection.acquire().await.unwrap();
+        query.fetch_one(conn).await?
     };
+
+    {
+        let (sql, values) = build_insert_query(
+            entities::group_member::Iden::Table,
+            vec![
+                entities::group_member::Iden::GroupId,
+                entities::group_member::Iden::UserId,
+                entities::group_member::Iden::IsAdmin,
+            ],
+            vec![created_group.id.into(), admin_user.into(), true.into()],
+        )?;
+
+        let query = sqlx::query_as_with::<_, entities::group_member::Entity, _>(&sql, values);
+        let conn = db_connection.acquire().await.unwrap();
+        query.fetch_one(conn).await?;
+    }
 
     let created_group_arc = Arc::new(created_group);
     cache_map.insert(created_group_arc.id, created_group_arc.clone());
