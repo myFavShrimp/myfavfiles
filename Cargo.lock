@@ -1368,6 +1368,7 @@ dependencies = [
  "myfavfiles_frontend",
  "tokio",
  "tower-http",
+ "tracing",
  "tracing-subscriber",
 ]
 

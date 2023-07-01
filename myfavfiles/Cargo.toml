@@ -10,6 +10,9 @@ myfavfiles_api = { path = "../myfavfiles_api" }
 myfavfiles_common = { path = "../myfavfiles_common" }
 myfavfiles_frontend = { path = "../myfavfiles_frontend" }
 
+[dependencies.tracing]
+workspace = true
+
 [dependencies.tracing-subscriber]
 workspace = true
 

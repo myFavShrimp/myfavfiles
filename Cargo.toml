@@ -17,6 +17,9 @@ features = ["full"]
 version = "1"
 features = ["serde"]
 
+[workspace.dependencies.tracing]
+version = "0.1"
+
 [workspace.dependencies.tracing-subscriber]
 version = "0.3"
 
