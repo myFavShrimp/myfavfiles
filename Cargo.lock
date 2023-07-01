@@ -1410,6 +1410,7 @@ dependencies = [
  "dotenv",
  "serde",
  "serde-env",
+ "tracing",
  "uuid",
 ]
 
