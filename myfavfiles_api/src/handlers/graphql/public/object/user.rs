@@ -91,7 +91,7 @@ pub async fn perform_registration(
         entities::user::Iden::Table,
         vec![entities::user::Iden::Name, entities::user::Iden::Password],
         values,
-    );
+    )?;
 
     let mut mutex = ctx.database_connection.lock().await;
     let conn = mutex.deref_mut();

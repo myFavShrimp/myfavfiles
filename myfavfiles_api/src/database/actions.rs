@@ -2,6 +2,8 @@ use sea_query::{Expr, Iden, PostgresQueryBuilder, Query, SimpleExpr, Value};
 use sea_query_binder::{SqlxBinder, SqlxValues};
 use uuid::Uuid;
 
+use super::repository::DataError;
+
 pub fn build_select_query<ColumnsEnum, IdType>(
     columns: Vec<ColumnsEnum>,
     table: ColumnsEnum,
@@ -29,17 +31,16 @@ pub fn build_insert_query<ColumnsEnum>(
     table: ColumnsEnum,
     columns: Vec<ColumnsEnum>,
     values: Vec<SimpleExpr>,
-) -> (String, SqlxValues)
+) -> Result<(String, SqlxValues), sea_query::error::Error>
 where
     ColumnsEnum: Iden + 'static,
 {
-    Query::insert()
+    Ok(Query::insert()
         .into_table(table)
         .columns(columns)
-        .values(values)
-        .unwrap()
+        .values(values)?
         .returning_all()
-        .build_sqlx(PostgresQueryBuilder)
+        .build_sqlx(PostgresQueryBuilder))
 }
 
 pub fn build_update_query<ColumnsEnum>(
