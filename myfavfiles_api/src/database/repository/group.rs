@@ -34,12 +34,21 @@ pub async fn create_group(
     group_name: String,
     admin_user: Uuid,
 ) -> Result<Arc<entities::group::Entity>, DataError> {
-    let (sql, values) = build_insert_query(
-        entities::group::Iden::Table,
-        vec![entities::group::Iden::Name],
-        vec![group_name.into()],
-    )?;
+    let cache_lock = cache.cache_map();
+    let mut cache_map = cache_lock.lock().await;
 
-    let query = sqlx::query_as_with::<_, entities::group::Entity, _>(&sql, values);
-    Ok(Arc::new(query.fetch_one(db_connection).await?))
+    let created_group = {
+        let (sql, values) = build_insert_query(
+            entities::group::Iden::Table,
+            vec![entities::group::Iden::Name],
+            vec![group_name.into()],
+        )?;
+
+        let query = sqlx::query_as_with::<_, entities::group::Entity, _>(&sql, values);
+        query.fetch_one(db_connection).await?
+    };
+
+    let created_group_arc = Arc::new(created_group);
+    cache_map.insert(created_group_arc.id, created_group_arc.clone());
+    Ok(created_group_arc)
 }
