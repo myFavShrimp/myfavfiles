@@ -2,8 +2,11 @@ use myfavfiles_api as api;
 use myfavfiles_common as common;
 use myfavfiles_frontend as frontend;
 
+use tower_http::trace::TraceLayer;
+
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
     let config = common::config::Config::default();
     api::database::initialize_database(&config.database_url).await;
 
@@ -11,7 +14,8 @@ async fn main() {
     let api_router = api::create_api_router(config).await;
     let app_router = axum::Router::new()
         .nest("/api", api_router)
-        .fallback(axum::routing::get(frontend::fallback_frontend_handler));
+        .fallback(axum::routing::get(frontend::fallback_frontend_handler))
+        .layer(TraceLayer::new_for_http());
 
     axum::Server::bind(&address)
         .serve(app_router.into_make_service())

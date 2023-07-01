@@ -62,6 +62,12 @@ features = [
     "uuid",
 ]
 
+[dependencies.tracing-subscriber]
+workspace = true
+
+[dependencies.tower-http]
+workspace = true
+
 [dependencies.tokio]
 workspace = true
 
