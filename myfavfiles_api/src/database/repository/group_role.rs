@@ -1,8 +1,11 @@
 use std::sync::Arc;
 
+use sqlx::Acquire;
 use uuid::Uuid;
 
-use crate::database::{cache::Cache, entities, loaders, PoolConnection};
+use crate::database::{
+    actions::build_insert_query, cache::Cache, entities, loaders, PoolConnection,
+};
 
 use super::DataError;
 
@@ -41,4 +44,33 @@ pub async fn group_roles_by_group_member_id(
     .await?;
 
     Ok(loaders::cached::find_many_cached(cache, db_connection, Some(ids_to_load)).await?)
+}
+
+pub async fn create_group_role(
+    db_connection: &mut PoolConnection,
+    cache: Cache<entities::group_role::Entity>,
+    group_role_name: String,
+    group_id: Uuid,
+) -> Result<Arc<entities::group_role::Entity>, DataError> {
+    let cache_lock = cache.cache_map();
+    let mut cache_map = cache_lock.lock().await;
+
+    let created_group_role = {
+        let (sql, values) = build_insert_query(
+            entities::group_role::Iden::Table,
+            vec![
+                entities::group_role::Iden::Name,
+                entities::group_role::Iden::GroupId,
+            ],
+            vec![group_role_name.into(), group_id.into()],
+        )?;
+
+        let query = sqlx::query_as_with::<_, entities::group_role::Entity, _>(&sql, values);
+        let conn = db_connection.acquire().await.unwrap();
+        query.fetch_one(conn).await?
+    };
+
+    let created_group_role_arc = Arc::new(created_group_role);
+    cache_map.insert(created_group_role_arc.id, created_group_role_arc.clone());
+    Ok(created_group_role_arc)
 }

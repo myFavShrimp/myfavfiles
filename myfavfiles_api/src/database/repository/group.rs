@@ -46,7 +46,7 @@ pub async fn create_group(
         )?;
 
         let query = sqlx::query_as_with::<_, entities::group::Entity, _>(&sql, values);
-        let conn = db_connection.acquire().await.unwrap();
+        let conn = db_connection.acquire().await?;
         query.fetch_one(conn).await?
     };
 
@@ -62,7 +62,7 @@ pub async fn create_group(
         )?;
 
         let query = sqlx::query_as_with::<_, entities::group_member::Entity, _>(&sql, values);
-        let conn = db_connection.acquire().await.unwrap();
+        let conn = db_connection.acquire().await?;
         query.fetch_one(conn).await?;
     }
 
